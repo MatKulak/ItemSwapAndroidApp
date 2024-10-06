@@ -1,4 +1,4 @@
-package com.mateusz.itemswap
+package com.mateusz.itemswap.activities
 
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -9,22 +9,91 @@ import android.util.Patterns
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.mateusz.itemswap.R
+import com.mateusz.itemswap.data.RegisterRequest
+import com.mateusz.itemswap.data.User
 import com.mateusz.itemswap.databinding.ActivityRegisterBinding
+import com.mateusz.itemswap.helpers.PreferencesHelper
+import com.mateusz.itemswap.utils.RetrofitClient
+import com.mateusz.itemswap.network.APIUser
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class RegisterActivity : AppCompatActivity(), View.OnClickListener, View.OnFocusChangeListener, View.OnKeyListener {
 
     private lateinit var mBinding: ActivityRegisterBinding
+    private lateinit var apiService: APIUser
+    private lateinit var preferencesHelper: PreferencesHelper
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mBinding = ActivityRegisterBinding.inflate(LayoutInflater.from(this))
         setContentView(mBinding.root)
-        mBinding.fullNameEt.onFocusChangeListener = this
+        preferencesHelper = PreferencesHelper(this)
+
+        apiService = RetrofitClient.getService(APIUser::class.java, preferencesHelper)
+
+        mBinding.nameEt.onFocusChangeListener = this
+        mBinding.surnameEt.onFocusChangeListener = this
+        mBinding.usernameEt.onFocusChangeListener = this
+        mBinding.phoneNumberEt.onFocusChangeListener = this
         mBinding.emailEt.onFocusChangeListener = this
         mBinding.passwordEt.onFocusChangeListener = this
         mBinding.confirmPasswordEt.onFocusChangeListener = this
+
         prepareTextChangeListener()
+        mBinding.registerBtn.setOnClickListener(this)
+    }
+
+    private fun registerUser() {
+        val name = mBinding.nameEt.text.toString()
+        val surname = mBinding.surnameEt.text.toString()
+        val username = mBinding.usernameEt.text.toString()
+        val phoneNumber = mBinding.phoneNumberEt.text.toString()
+        val email = mBinding.emailEt.text.toString()
+        val password = mBinding.passwordEt.text.toString()
+        val confirmPassword = mBinding.confirmPasswordEt.text.toString()
+
+        val registerRequest = RegisterRequest(
+            name = name,
+            surname = surname,
+            username = username,
+            phoneNumber = phoneNumber,
+            email = email,
+            password = password,
+            confirmPassword = confirmPassword
+        )
+
+        // Make API call using Retrofit
+        val call = apiService.register(registerRequest)
+        call.enqueue(object : Callback<User> {
+            override fun onResponse(call: Call<User>, response: Response<User>) {
+                if (response.isSuccessful) {
+                    val user = response.body()
+                    runOnUiThread {
+                        Toast.makeText(this@RegisterActivity, "Registration successful! Welcome, ${user?.name}", Toast.LENGTH_LONG).show()
+                        // You can navigate to the next activity here
+                    }
+                } else {
+                    // Handle unsuccessful response, such as a 4xx or 5xx response code
+                    runOnUiThread {
+                        Toast.makeText(this@RegisterActivity, "Registration failed: ${response.message()}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<User>, t: Throwable) {
+                // Handle failure, such as a network error or serialization issue
+                runOnUiThread {
+                    Toast.makeText(this@RegisterActivity, "Error: ${t.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        })
     }
 
     private fun prepareTextChangeListener() {
@@ -61,13 +130,58 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener, View.OnFocus
         })
     }
 
-    private fun validateFullName(): Boolean {
+    private fun validateName(): Boolean {
         var errorMessage: String? = null
-        val value: String = mBinding.fullNameEt.text.toString()
-        if (value.isEmpty()) errorMessage = "Full name is required"
+        val value: String = mBinding.nameEt.text.toString()
+        if (value.isEmpty()) errorMessage = "Name is required"
 
         if (errorMessage != null) {
-            mBinding.fullNameTil.apply {
+            mBinding.nameTil.apply {
+                isErrorEnabled = true
+                error = errorMessage
+            }
+        }
+
+        return errorMessage == null
+    }
+
+    private fun validateSurname(): Boolean {
+        var errorMessage: String? = null
+        val value: String = mBinding.surnameEt.text.toString()
+        if (value.isEmpty()) errorMessage = "Surname is required"
+
+        if (errorMessage != null) {
+            mBinding.surnameTil.apply {
+                isErrorEnabled = true
+                error = errorMessage
+            }
+        }
+
+        return errorMessage == null
+    }
+
+    private fun validateUsername(): Boolean {
+        var errorMessage: String? = null
+        val value: String = mBinding.usernameEt.text.toString()
+        if (value.isEmpty()) errorMessage = "Username is required"
+
+        if (errorMessage != null) {
+            mBinding.usernameTil.apply {
+                isErrorEnabled = true
+                error = errorMessage
+            }
+        }
+
+        return errorMessage == null
+    }
+
+    private fun validatePhoneNumber(): Boolean {
+        var errorMessage: String? = null
+        val value: String = mBinding.phoneNumberEt.text.toString()
+        if (value.isEmpty()) errorMessage = "Phone number is required"
+
+        if (errorMessage != null) {
+            mBinding.phoneNumberTil.apply {
                 isErrorEnabled = true
                 error = errorMessage
             }
@@ -152,19 +266,57 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener, View.OnFocus
 
 
     override fun onClick(view: View?) {
-        TODO("Not yet implemented")
+        if (view?.id == R.id.registerBtn) {
+            // Validate inputs before registering
+            if (validateAllFields()) {
+                registerUser()
+            }
+        }
+    }
+
+    private fun validateAllFields(): Boolean {
+        return validateName() && validateSurname() && validateUsername() &&
+                validatePhoneNumber() && validateEmail() && validatePassword() &&
+                validateConfirmPassword() && validatePasswordAndConfirmPassword()
     }
 
     override fun onFocusChange(view: View?, hasFocus: Boolean) {
         if (view != null) {
             when(view.id) {
-                R.id.fullNameEt -> {
+                R.id.nameEt -> {
                     if (hasFocus) {
-                        if(mBinding.fullNameTil.isErrorEnabled) {
-                            mBinding.fullNameTil.isErrorEnabled = false
+                        if(mBinding.nameTil.isErrorEnabled) {
+                            mBinding.nameTil.isErrorEnabled = false
                         }
                     } else {
-                        validateFullName()
+                        validateName()
+                    }
+                }
+                R.id.surnameEt -> {
+                    if (hasFocus) {
+                        if(mBinding.surnameTil.isErrorEnabled) {
+                            mBinding.surnameTil.isErrorEnabled = false
+                        }
+                    } else {
+                        validateSurname()
+                    }
+                }
+                R.id.usernameEt -> {
+                    if (hasFocus) {
+                        if(mBinding.usernameTil.isErrorEnabled) {
+                            mBinding.usernameTil.isErrorEnabled = false
+                        }
+                    } else {
+                        validateUsername()
+                    }
+                }
+                R.id.phoneNumberEt -> {
+                    if (hasFocus) {
+                        if(mBinding.phoneNumberTil.isErrorEnabled) {
+                            mBinding.phoneNumberTil.isErrorEnabled = false
+                        }
+                    } else {
+                        validatePhoneNumber()
                     }
                 }
                 R.id.emailEt -> {
