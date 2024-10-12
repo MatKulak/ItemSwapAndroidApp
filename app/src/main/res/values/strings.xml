@@ -8,6 +8,15 @@
     <string name="name">Name</string>
     <string name="surname">Surname</string>
     <string name="username">Username</string>
-    <string name="phone_number">Phone number</string>
-    <string name="log_in">Log in</string>
+    <string name="phoneNumber">Phone number</string>
+    <string name="login">Log in</string>
+    <string name="logout">Log out</string>
+    <string name="add_advertisement">Add advertisement</string>
+    <string name="addPhotos">Add photos</string>
+    <string name="title">Title</string>
+    <string name="chooseCategory">Choose category</string>
+    <string name="description">Description</string>
+    <string name="contact">Contact</string>
+    <string name="localization">Localization</string>
+    <string name="add">Add</string>
 </resources>

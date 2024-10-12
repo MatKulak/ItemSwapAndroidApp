@@ -55,4 +55,6 @@ dependencies {
 
     // Crypto
     implementation(libs.crypto)
+
+    implementation(libs.adapter)
 }

@@ -29,11 +29,12 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        preferencesHelper = PreferencesHelper(this)
         usernameEditText = findViewById(R.id.usernameEditText)
         passwordEditText = findViewById(R.id.passwordEditText)
         loginButton = findViewById(R.id.loginButton)
         apiAuthenticate = RetrofitClient.getService(APIAuthenticate::class.java, preferencesHelper)
-        preferencesHelper = PreferencesHelper(this)
+        preferencesHelper.clearAll();
 
         loginButton.setOnClickListener {
             login()

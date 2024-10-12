@@ -14,4 +14,7 @@ interface APIAuthenticate {
 
     @POST("/auth/login")
     fun login(@Body loginRequest: LoginRequest): Call<AuthenticationResponse>
+
+    @POST("/logout")
+    fun logout(): Call<Void>
 }

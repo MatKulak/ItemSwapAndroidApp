@@ -13,6 +13,7 @@ constraintlayout = "2.1.4"
 retrofit = "2.9.0"
 #Crypto
 crypto = "1.1.0-alpha03"
+adapter = "2.6.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -28,6 +29,7 @@ retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = 
 retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 #Crypto
 crypto = { group = "androidx.security", name = "security-crypto", version.ref = "crypto" }
+adapter = { group = "com.squareup.retrofit2", name = "adapter-rxjava2", version.ref = "adapter"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

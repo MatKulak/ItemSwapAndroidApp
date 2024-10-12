@@ -86,7 +86,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="12dp"
-                    android:hint="@string/phone_number"
+                    android:hint="@string/phoneNumber"
                     android:inputType="number"/>
             </com.google.android.material.textfield.TextInputLayout>
 
