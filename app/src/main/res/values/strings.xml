@@ -19,4 +19,5 @@
     <string name="contact">Contact</string>
     <string name="localization">Localization</string>
     <string name="add">Add</string>
+    <string name="choose_condition">Choose condition</string>
 </resources>

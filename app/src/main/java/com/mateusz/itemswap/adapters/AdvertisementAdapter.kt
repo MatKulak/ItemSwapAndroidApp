@@ -1,53 +1,78 @@
 package com.mateusz.itemswap.adapters
 
+import android.graphics.BitmapFactory
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.mateusz.itemswap.R
-import com.mateusz.itemswap.data.AdvertisementWithFilesResponse
-//import com.mateusz.itemswap.model.AdvertisementWithFilesResponse
-import com.mateusz.itemswap.databinding.ItemAdvertisementBinding
+import com.mateusz.itemswap.data.AdvertisementWithFileResponse
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-class AdvertisementAdapter : RecyclerView.Adapter<AdvertisementAdapter.AdvertisementViewHolder>() {
+class AdvertisementAdapter(private val advertisements: MutableList<AdvertisementWithFileResponse>) :
+    RecyclerView.Adapter<AdvertisementAdapter.ViewHolder>() {
 
-    private val advertisementList = mutableListOf<AdvertisementWithFilesResponse>()
-
-    fun addAdvertisements(newAdvertisements: List<AdvertisementWithFilesResponse>) {
-        advertisementList.addAll(newAdvertisements)
-        notifyDataSetChanged()
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val imageView: ImageView = view.findViewById(R.id.itemImage)
+        val titleView: TextView = view.findViewById(R.id.itemTitle)
+        val conditionView: TextView = view.findViewById(R.id.itemCondition)
+        val cityView: TextView = view.findViewById(R.id.itemCity)
+        val addDateView: TextView = view.findViewById(R.id.itemAddDate)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdvertisementViewHolder {
-        val binding = ItemAdvertisementBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return AdvertisementViewHolder(binding)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_advertisement, parent, false)
+        return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: AdvertisementViewHolder, position: Int) {
-        val advertisement = advertisementList[position]
-        holder.bind(advertisement)
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val advertisement = advertisements[position]
+        holder.titleView.text = advertisement.simpleAdvertisementResponse.title
+        holder.conditionView.text = advertisement.simpleAdvertisementResponse.condition
+        holder.cityView.text = advertisement.simpleAdvertisementResponse.city
+        holder.addDateView.text = formatDateString(advertisement.simpleAdvertisementResponse.addDate)
+
+        val decodedFile = decodeBase64ToByteArray(advertisement.file)
+        if (decodedFile != null) {
+            val bitmap = BitmapFactory.decodeByteArray(decodedFile, 0, decodedFile.size)
+            holder.imageView.setImageBitmap(bitmap)
+        }
     }
 
-    override fun getItemCount(): Int = advertisementList.size
 
-    inner class AdvertisementViewHolder(private val binding: ItemAdvertisementBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    override fun getItemCount(): Int {
+        return advertisements.size
+    }
 
-        fun bind(advertisement: AdvertisementWithFilesResponse) {
-            val adResponse = advertisement.advertisementResponse
-            binding.textTitle.text = adResponse.title
-            binding.textAddDate.text = adResponse.addDate.toString() // Format as needed
+    fun addItems(newAdvertisements: List<AdvertisementWithFileResponse>) {
+        val startPosition = advertisements.size
+        advertisements.addAll(newAdvertisements)
+        notifyItemRangeInserted(startPosition, newAdvertisements.size)
+    }
 
-            // If the advertisement contains images, load the first one (e.g., with Glide or Picasso)
-            if (advertisement.files.isNotEmpty()) {
-                // Glide.with(binding.imageAdvertisement.context)
-                //     .load(advertisement.files[0]) // Assuming it's a byte array, convert it accordingly
-                //     .into(binding.imageAdvertisement)
+    private fun decodeBase64ToByteArray(base64String: String?): ByteArray? {
+        return base64String?.let {
+            try {
+                Base64.decode(it, Base64.DEFAULT)
+            } catch (e: IllegalArgumentException) {
+                null
             }
+        }
+    }
+
+    private fun formatDateString(dateString: String): String {
+        return try {
+            val originalFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
+            val date: Date? = originalFormat.parse(dateString)
+            val targetFormat = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
+            date?.let { targetFormat.format(it) } ?: dateString
+        } catch (e: Exception) {
+            dateString
         }
     }
 }

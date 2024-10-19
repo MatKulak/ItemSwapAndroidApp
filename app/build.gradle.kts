@@ -57,4 +57,7 @@ dependencies {
     implementation(libs.crypto)
 
     implementation(libs.adapter)
+
+    implementation(libs.paging.runtime)
+    implementation(libs.paging.common)
 }
