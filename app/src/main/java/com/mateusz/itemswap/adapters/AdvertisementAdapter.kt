@@ -9,12 +9,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.mateusz.itemswap.R
-import com.mateusz.itemswap.data.AdvertisementWithFileResponse
+import com.mateusz.itemswap.data.advertisement.AdvertisementWithFileResponse
+import com.mateusz.itemswap.data.advertisement.DetailedAdvertisementWithFilesResponse
+import com.mateusz.itemswap.network.APIAdvertisement
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
-class AdvertisementAdapter(private val advertisements: MutableList<AdvertisementWithFileResponse>) :
+class AdvertisementAdapter(private val advertisements: MutableList<AdvertisementWithFileResponse>,
+                           private val apiAdvertisement: APIAdvertisement) :
     RecyclerView.Adapter<AdvertisementAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -41,6 +48,10 @@ class AdvertisementAdapter(private val advertisements: MutableList<Advertisement
         if (decodedFile != null) {
             val bitmap = BitmapFactory.decodeByteArray(decodedFile, 0, decodedFile.size)
             holder.imageView.setImageBitmap(bitmap)
+        }
+
+        holder.itemView.setOnClickListener {
+            getAdvertisementDetails(advertisement.simpleAdvertisementResponse.id)
         }
     }
 
@@ -74,5 +85,34 @@ class AdvertisementAdapter(private val advertisements: MutableList<Advertisement
         } catch (e: Exception) {
             dateString
         }
+    }
+
+    private fun getAdvertisementDetails(id: UUID) {
+        apiAdvertisement.getOneById(id).enqueue(object : Callback<DetailedAdvertisementWithFilesResponse> {
+            override fun onResponse(call: Call<DetailedAdvertisementWithFilesResponse>,
+                                    response: Response<DetailedAdvertisementWithFilesResponse>) {
+
+                if (response.isSuccessful) {
+                    // Handle the successful response here
+                    val advertisementDetails = response.body()
+                    advertisementDetails?.let {
+                        // Process the advertisement details
+                        println("Advertisement Details: $it")
+                    } ?: run {
+                        // Handle the case where the body is null
+                        println("Response body is null")
+                    }
+                } else {
+                    // Handle the error response (non-2xx status code)
+                    println("Error response code: ${response.code()}")
+                    println("Error message: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<DetailedAdvertisementWithFilesResponse>, t: Throwable) {
+                // Handle the failure (network error, timeout, etc.)
+                println("Failed to fetch advertisement details: ${t.message}")
+            }
+        })
     }
 }

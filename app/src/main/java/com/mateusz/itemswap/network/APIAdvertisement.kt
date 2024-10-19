@@ -1,5 +1,8 @@
 package com.mateusz.itemswap.network
 
+import com.mateusz.itemswap.data.advertisement.AdvertisementWithFileResponse
+import com.mateusz.itemswap.data.advertisement.DetailedAdvertisementWithFilesResponse
+import com.mateusz.itemswap.ztest.Page
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -8,8 +11,9 @@ import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
-import retrofit2.http.QueryMap
+import java.util.UUID
 
 interface APIAdvertisement {
 
@@ -20,10 +24,14 @@ interface APIAdvertisement {
         @Part("data") requestBody: RequestBody
     ): Call<ResponseBody>
 
-    @GET("/api/advertisements")
+    @GET("/api/advertisements/page")
     fun getAllAdvertisements(
         @Query("page") page: Int,
-        @Query("size") size: Int,
-        @QueryMap filters: Map<String, String>
-    ): Call<ResponseBody>
+        @Query("size") size: Int
+    ): Call<Page<AdvertisementWithFileResponse>>
+
+    @GET("/api/advertisements/{id}")
+    fun getOneById(
+        @Path("id") id: UUID
+    ): Call<DetailedAdvertisementWithFilesResponse>
 }

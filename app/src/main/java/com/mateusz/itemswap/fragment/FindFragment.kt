@@ -10,10 +10,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mateusz.itemswap.R
 import com.mateusz.itemswap.adapters.AdvertisementAdapter
-import com.mateusz.itemswap.data.AdvertisementWithFileResponse
+import com.mateusz.itemswap.data.advertisement.AdvertisementWithFileResponse
 import com.mateusz.itemswap.helpers.PreferencesHelper
+import com.mateusz.itemswap.network.APIAdvertisement
 import com.mateusz.itemswap.utils.RetrofitClient
-import com.mateusz.itemswap.ztest.ApiService
 import com.mateusz.itemswap.ztest.Page
 import retrofit2.Call
 import retrofit2.Callback
@@ -24,7 +24,7 @@ class FindFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var advertisementAdapter: AdvertisementAdapter
     private lateinit var preferencesHelper: PreferencesHelper
-    private lateinit var apiService: ApiService
+    private lateinit var apiAdvertisement: APIAdvertisement
 
     private var currentPage = 0
     private var isLoading = false
@@ -38,9 +38,9 @@ class FindFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(context)
         preferencesHelper = PreferencesHelper(requireContext())
-        apiService = RetrofitClient.getService(ApiService::class.java, preferencesHelper)
+        apiAdvertisement = RetrofitClient.getService(APIAdvertisement::class.java, preferencesHelper)
 
-        advertisementAdapter = AdvertisementAdapter(mutableListOf())
+        advertisementAdapter = AdvertisementAdapter(mutableListOf(), apiAdvertisement)
         recyclerView.adapter = advertisementAdapter
 
         setupScrollListener()
@@ -73,7 +73,7 @@ class FindFragment : Fragment() {
     private fun fetchAdvertisementsFromBackend(page: Int) {
         isLoading = true
 
-        apiService.getAllAdvertisements(page, 10).enqueue(object : Callback<Page<AdvertisementWithFileResponse>> {
+        apiAdvertisement.getAllAdvertisements(page, 10).enqueue(object : Callback<Page<AdvertisementWithFileResponse>> {
             override fun onResponse(
                 call: Call<Page<AdvertisementWithFileResponse>>,
                 response: Response<Page<AdvertisementWithFileResponse>>

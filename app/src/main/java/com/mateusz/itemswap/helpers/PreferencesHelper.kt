@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.gson.Gson
-import com.mateusz.itemswap.data.User
+import com.mateusz.itemswap.data.user.User
 
 class PreferencesHelper(context: Context) {
 

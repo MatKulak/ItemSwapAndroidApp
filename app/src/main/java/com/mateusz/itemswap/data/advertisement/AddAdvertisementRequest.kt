@@ -1,6 +1,4 @@
-package com.mateusz.itemswap.data
-
-import com.mateusz.itemswap.enums.ProductCategories
+package com.mateusz.itemswap.data.advertisement
 
 data class AddAdvertisementRequest(
     val title: String,

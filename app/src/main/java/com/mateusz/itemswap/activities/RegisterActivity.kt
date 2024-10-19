@@ -12,8 +12,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.mateusz.itemswap.R
-import com.mateusz.itemswap.data.RegisterRequest
-import com.mateusz.itemswap.data.User
+import com.mateusz.itemswap.data.auth.RegisterRequest
+import com.mateusz.itemswap.data.user.User
 import com.mateusz.itemswap.databinding.ActivityRegisterBinding
 import com.mateusz.itemswap.helpers.PreferencesHelper
 import com.mateusz.itemswap.utils.RetrofitClient

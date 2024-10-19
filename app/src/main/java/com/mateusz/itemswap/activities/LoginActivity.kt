@@ -7,8 +7,8 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.mateusz.itemswap.R
-import com.mateusz.itemswap.auth.dto.LoginRequest
-import com.mateusz.itemswap.auth.dto.AuthenticationResponse
+import com.mateusz.itemswap.data.auth.LoginRequest
+import com.mateusz.itemswap.data.auth.AuthenticationResponse
 import com.mateusz.itemswap.helpers.PreferencesHelper
 import com.mateusz.itemswap.network.APIAuthenticate
 import com.mateusz.itemswap.utils.RetrofitClient

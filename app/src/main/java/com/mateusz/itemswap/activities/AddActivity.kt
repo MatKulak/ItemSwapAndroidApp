@@ -21,7 +21,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.mateusz.itemswap.R
-import com.mateusz.itemswap.data.AddAdvertisementRequest
+import com.mateusz.itemswap.data.advertisement.AddAdvertisementRequest
 import com.mateusz.itemswap.enums.Condition
 import com.mateusz.itemswap.enums.ProductCategories
 import com.mateusz.itemswap.helpers.PreferencesHelper

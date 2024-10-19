@@ -1,4 +1,4 @@
-package com.mateusz.itemswap.data
+package com.mateusz.itemswap.data.user
 
 data class User (
     val id: String,

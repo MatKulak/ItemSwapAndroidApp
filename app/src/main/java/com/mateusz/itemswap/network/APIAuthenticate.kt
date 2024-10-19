@@ -1,8 +1,8 @@
 package com.mateusz.itemswap.network
 
-import com.mateusz.itemswap.auth.dto.LoginRequest
-import com.mateusz.itemswap.auth.dto.AuthenticationResponse
-import com.mateusz.itemswap.data.RegisterRequest
+import com.mateusz.itemswap.data.auth.LoginRequest
+import com.mateusz.itemswap.data.auth.AuthenticationResponse
+import com.mateusz.itemswap.data.auth.RegisterRequest
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST

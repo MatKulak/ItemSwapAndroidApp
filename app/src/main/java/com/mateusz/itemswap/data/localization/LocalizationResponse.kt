@@ -1,4 +1,4 @@
-package com.mateusz.itemswap.data
+package com.mateusz.itemswap.data.localization
 
 data class LocalizationResponse(
     val city: String,

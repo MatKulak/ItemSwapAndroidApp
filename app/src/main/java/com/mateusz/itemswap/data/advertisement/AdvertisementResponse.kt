@@ -1,5 +1,8 @@
-package com.mateusz.itemswap.data
+package com.mateusz.itemswap.data.advertisement
 
+import com.mateusz.itemswap.data.localization.LocalizationResponse
+import com.mateusz.itemswap.data.category.MainCategoryResponse
+import com.mateusz.itemswap.data.user.UserResponse
 import java.time.LocalDateTime
 import java.util.UUID
 

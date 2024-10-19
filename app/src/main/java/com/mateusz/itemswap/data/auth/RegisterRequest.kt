@@ -1,4 +1,4 @@
-package com.mateusz.itemswap.data
+package com.mateusz.itemswap.data.auth
 
 data class RegisterRequest(
     val name: String,
