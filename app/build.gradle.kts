@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -49,15 +50,12 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    // Retrofit and Gson Converter
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
-
-    // Crypto
     implementation(libs.crypto)
-
     implementation(libs.adapter)
-
     implementation(libs.paging.runtime)
     implementation(libs.paging.common)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.viewpager2)
 }

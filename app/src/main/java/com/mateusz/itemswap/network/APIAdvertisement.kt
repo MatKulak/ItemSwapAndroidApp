@@ -1,6 +1,7 @@
 package com.mateusz.itemswap.network
 
 import com.mateusz.itemswap.data.advertisement.AdvertisementWithFileResponse
+import com.mateusz.itemswap.data.advertisement.DetailedAdvertisementResponse
 import com.mateusz.itemswap.data.advertisement.DetailedAdvertisementWithFilesResponse
 import com.mateusz.itemswap.ztest.Page
 import okhttp3.MultipartBody
@@ -31,7 +32,12 @@ interface APIAdvertisement {
     ): Call<Page<AdvertisementWithFileResponse>>
 
     @GET("/api/advertisements/{id}")
-    fun getOneById(
+    fun getAdvertisementById(
         @Path("id") id: UUID
-    ): Call<DetailedAdvertisementWithFilesResponse>
+    ): Call<DetailedAdvertisementResponse>
+
+    @GET("/api/advertisements/{id}/files")
+    fun getAdvertisementFiles(
+        @Path("id") id: UUID
+    ): Call<List<String>>
 }

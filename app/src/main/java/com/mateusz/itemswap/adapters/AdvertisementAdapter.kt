@@ -1,7 +1,8 @@
 package com.mateusz.itemswap.adapters
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
-import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,15 +10,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.mateusz.itemswap.R
+import com.mateusz.itemswap.activities.AdvertisementActivity
 import com.mateusz.itemswap.data.advertisement.AdvertisementWithFileResponse
-import com.mateusz.itemswap.data.advertisement.DetailedAdvertisementWithFilesResponse
+import com.mateusz.itemswap.data.advertisement.DetailedAdvertisementResponse
 import com.mateusz.itemswap.network.APIAdvertisement
+import com.mateusz.itemswap.utils.DateUtils.formatDateString
+import com.mateusz.itemswap.utils.Utils.decodeBase64ToByteArray
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import java.util.UUID
 
 class AdvertisementAdapter(private val advertisements: MutableList<AdvertisementWithFileResponse>,
@@ -51,10 +52,9 @@ class AdvertisementAdapter(private val advertisements: MutableList<Advertisement
         }
 
         holder.itemView.setOnClickListener {
-            getAdvertisementDetails(advertisement.simpleAdvertisementResponse.id)
+            getAdvertisementDetails(advertisement.simpleAdvertisementResponse.id, holder.itemView.context)
         }
     }
-
 
     override fun getItemCount(): Int {
         return advertisements.size
@@ -66,52 +66,26 @@ class AdvertisementAdapter(private val advertisements: MutableList<Advertisement
         notifyItemRangeInserted(startPosition, newAdvertisements.size)
     }
 
-    private fun decodeBase64ToByteArray(base64String: String?): ByteArray? {
-        return base64String?.let {
-            try {
-                Base64.decode(it, Base64.DEFAULT)
-            } catch (e: IllegalArgumentException) {
-                null
-            }
-        }
-    }
-
-    private fun formatDateString(dateString: String): String {
-        return try {
-            val originalFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
-            val date: Date? = originalFormat.parse(dateString)
-            val targetFormat = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
-            date?.let { targetFormat.format(it) } ?: dateString
-        } catch (e: Exception) {
-            dateString
-        }
-    }
-
-    private fun getAdvertisementDetails(id: UUID) {
-        apiAdvertisement.getOneById(id).enqueue(object : Callback<DetailedAdvertisementWithFilesResponse> {
-            override fun onResponse(call: Call<DetailedAdvertisementWithFilesResponse>,
-                                    response: Response<DetailedAdvertisementWithFilesResponse>) {
-
+    private fun getAdvertisementDetails(id: UUID, context: Context) {
+        apiAdvertisement.getAdvertisementById(id).enqueue(object : Callback<DetailedAdvertisementResponse> {
+            override fun onResponse(call: Call<DetailedAdvertisementResponse>, response: Response<DetailedAdvertisementResponse>) {
                 if (response.isSuccessful) {
-                    // Handle the successful response here
-                    val advertisementDetails = response.body()
-                    advertisementDetails?.let {
-                        // Process the advertisement details
-                        println("Advertisement Details: $it")
+                    val detailedAdvertisementResponse = response.body()
+                    detailedAdvertisementResponse?.let {
+                        val intent = Intent(context, AdvertisementActivity::class.java).apply {
+                            putExtra("advertisement_details", it)
+                        }
+                        context.startActivity(intent)
                     } ?: run {
-                        // Handle the case where the body is null
-                        println("Response body is null")
+                        TODO()
                     }
                 } else {
-                    // Handle the error response (non-2xx status code)
-                    println("Error response code: ${response.code()}")
-                    println("Error message: ${response.message()}")
+                    TODO()
                 }
             }
 
-            override fun onFailure(call: Call<DetailedAdvertisementWithFilesResponse>, t: Throwable) {
-                // Handle the failure (network error, timeout, etc.)
-                println("Failed to fetch advertisement details: ${t.message}")
+            override fun onFailure(call: Call<DetailedAdvertisementResponse>, t: Throwable) {
+                TODO()
             }
         })
     }
