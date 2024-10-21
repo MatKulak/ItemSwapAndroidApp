@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mateusz.itemswap.R
 import com.mateusz.itemswap.utils.Utils.decodeBase64ToByteArray
 
-class ImagePagerAdapter(private val base64Images: List<String>) : RecyclerView.Adapter<ImagePagerAdapter.ImageViewHolder>() {
+class ImagePagerAdapter(private val images: List<String>) :
+    RecyclerView.Adapter<ImagePagerAdapter.ImageViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_image_pager, parent, false)
@@ -17,15 +18,13 @@ class ImagePagerAdapter(private val base64Images: List<String>) : RecyclerView.A
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        val base64String = base64Images[position]
-        val decodedByteArray = decodeBase64ToByteArray(base64String)
-        decodedByteArray?.let {
-            val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
-            holder.imageView.setImageBitmap(bitmap)
-        }
+        val base64Image = images[position]
+        val decodedByteArray = decodeBase64ToByteArray(base64Image)
+        val bitmap = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray?.size ?: 0)
+        holder.imageView.setImageBitmap(bitmap)
     }
 
-    override fun getItemCount(): Int = base64Images.size
+    override fun getItemCount(): Int = images.size
 
     class ImageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imageView: ImageView = view.findViewById(R.id.imageView)

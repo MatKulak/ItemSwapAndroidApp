@@ -96,7 +96,6 @@ class FindFragment : Fragment() {
 
             override fun onFailure(call: Call<Page<AdvertisementWithFileResponse>>, t: Throwable) {
                 isLoading = false
-                Log.e("FindFragment", "Error fetching advertisements", t) // Log the error
             }
         })
     }

@@ -1,6 +1,7 @@
 package com.mateusz.itemswap.data.advertisement
 
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 import com.mateusz.itemswap.data.localization.LocalizationResponse
 import com.mateusz.itemswap.data.user.UserResponse
 import kotlinx.parcelize.Parcelize
@@ -14,5 +15,6 @@ data class DetailedAdvertisementResponse(
     val addDate: String?,
     val description: String?,
     val localizationResponse: LocalizationResponse,
-    val userResponse: UserResponse
+    val userResponse: UserResponse,
+    @SerializedName("isFollowed") val isFollowed: Boolean
 ) : Parcelable

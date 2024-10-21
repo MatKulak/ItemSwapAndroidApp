@@ -40,4 +40,9 @@ interface APIAdvertisement {
     fun getAdvertisementFiles(
         @Path("id") id: UUID
     ): Call<List<String>>
+
+    @POST("/api/advertisements/{id}/followers")
+    fun updateAdvertisementFollowers(
+        @Path("id") id: UUID
+    ): Call<Boolean>
 }
