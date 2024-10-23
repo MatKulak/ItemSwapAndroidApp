@@ -13,4 +13,16 @@ object Utils {
             }
         }
     }
+
+    fun createParams(vararg params: Pair<String, String>): Map<String, String> {
+        return mapOf(*params)
+    }
+
+    fun updateParams(oldParams: Map<String, String>, newParams: Map<String, String>): Map<String, String> {
+        return oldParams.plus(newParams)
+    }
+
+    fun removeParams(map: Map<String, String>, vararg keysToRemove: String): Map<String, String> {
+        return map.filterKeys { it !in keysToRemove }
+    }
 }
