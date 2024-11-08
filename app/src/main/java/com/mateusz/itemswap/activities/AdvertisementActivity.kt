@@ -62,6 +62,13 @@ class AdvertisementActivity : AppCompatActivity() {
         closeImageButton.setOnClickListener {
             goBackToList()
         }
+        sendMessageButton.setOnClickListener {
+            sendMessage()
+        }
+    }
+
+    private fun sendMessage() {
+
     }
 
     private fun goBackToList() {
