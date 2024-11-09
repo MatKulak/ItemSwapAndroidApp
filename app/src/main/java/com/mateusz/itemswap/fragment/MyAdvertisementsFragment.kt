@@ -12,7 +12,7 @@ class MyAdvertisementsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_find, container, false)
-        val fragment = AdvertisementsListFragment.newInstance(createParams("filter" to "user"))
+        val fragment = AdvertisementsListFragment.newInstance(createParams("filter" to "user"), true)
         childFragmentManager.beginTransaction()
             .replace(R.id.advertisementsListContainer, fragment)
             .commit()

@@ -5,6 +5,7 @@ import com.mateusz.itemswap.data.auth.AuthenticationResponse
 import com.mateusz.itemswap.data.auth.RegisterRequest
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface APIAuthenticate {
@@ -17,4 +18,7 @@ interface APIAuthenticate {
 
     @POST("/logout")
     fun logout(): Call<Void>
+
+    @GET("/auth/logged-in")
+    fun isLoggedIn(): Call<Boolean>
 }

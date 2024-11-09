@@ -31,6 +31,7 @@ class AdvertisementsListFragment : Fragment() {
     private var currentPage = 0
     private var isLoading = false
     private var isLastPage = false
+    private var personalAdvertisement = false
 
     private var params = createParams(
         "page" to "0",
@@ -38,10 +39,11 @@ class AdvertisementsListFragment : Fragment() {
     )
 
     companion object {
-        fun newInstance(params: Map<String, String>): AdvertisementsListFragment {
+        fun newInstance(params: Map<String, String>, personalAdvertisement: Boolean? = false): AdvertisementsListFragment {
             val fragment = AdvertisementsListFragment()
             val bundle = Bundle()
             bundle.putSerializable("params", HashMap(params))
+            bundle.putSerializable("personalAdvertisement", personalAdvertisement)
             fragment.arguments = bundle
             return fragment
         }
@@ -56,6 +58,7 @@ class AdvertisementsListFragment : Fragment() {
         arguments?.let {
             val newParams = it.getSerializable("params") as HashMap<String, String>
             params = updateParams(params, newParams)
+            personalAdvertisement = it.getSerializable("personalAdvertisement") as Boolean
         }
     }
 
@@ -70,7 +73,7 @@ class AdvertisementsListFragment : Fragment() {
         preferencesHelper = PreferencesHelper(requireContext())
         apiAdvertisement = RetrofitClient.getService(APIAdvertisement::class.java, preferencesHelper)
 
-        advertisementAdapter = AdvertisementAdapter(mutableListOf(), apiAdvertisement)
+        advertisementAdapter = AdvertisementAdapter(mutableListOf(), apiAdvertisement, personalAdvertisement)
         recyclerView.adapter = advertisementAdapter
 
         setupScrollListener()

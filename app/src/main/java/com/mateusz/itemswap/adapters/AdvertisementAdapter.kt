@@ -22,7 +22,8 @@ import retrofit2.Response
 import java.util.UUID
 
 class AdvertisementAdapter(private val advertisements: MutableList<AdvertisementWithFileResponse>,
-                           private val apiAdvertisement: APIAdvertisement) :
+                           private val apiAdvertisement: APIAdvertisement,
+                           private val personalAdvertisement: Boolean = false) :
     RecyclerView.Adapter<AdvertisementAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -73,7 +74,8 @@ class AdvertisementAdapter(private val advertisements: MutableList<Advertisement
                     val detailedAdvertisementResponse = response.body()
                     detailedAdvertisementResponse?.let {
                         val intent = Intent(context, AdvertisementActivity::class.java).apply {
-                            putExtra("advertisement_details", it)
+                            putExtra("advertisementDetails", it)
+                            putExtra("personalAdvertisement", personalAdvertisement)
                         }
                         context.startActivity(intent)
                     } ?: run {

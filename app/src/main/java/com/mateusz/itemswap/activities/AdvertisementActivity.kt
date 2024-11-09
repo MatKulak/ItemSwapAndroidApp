@@ -2,6 +2,7 @@ package com.mateusz.itemswap.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
@@ -35,6 +36,8 @@ class AdvertisementActivity : AppCompatActivity() {
     private lateinit var followImageButton: ImageButton
     private lateinit var callButton: Button
 
+    private var personalAdvertisement = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_advertisement)
@@ -52,6 +55,11 @@ class AdvertisementActivity : AppCompatActivity() {
         sendMessageButton = findViewById(R.id.sendMessageButton)
         followImageButton = findViewById(R.id.followImageButton)
         callButton = findViewById(R.id.callButton)
+
+        personalAdvertisement = intent.getBooleanExtra("personalAdvertisement", false)
+        sendMessageButton.visibility = if (!personalAdvertisement) View.VISIBLE else View.GONE
+        followImageButton.visibility = if (!personalAdvertisement) View.VISIBLE else View.GONE
+
         setDetailedAdvertisementResponse()
         setDataFromResponse()
         setInitialFollowStatus()
@@ -62,6 +70,13 @@ class AdvertisementActivity : AppCompatActivity() {
         closeImageButton.setOnClickListener {
             goBackToList()
         }
+        sendMessageButton.setOnClickListener {
+            sendMessage()
+        }
+    }
+
+    private fun sendMessage() {
+
     }
 
     private fun goBackToList() {
@@ -92,7 +107,7 @@ class AdvertisementActivity : AppCompatActivity() {
 
     private fun setDetailedAdvertisementResponse() {
         val advertisementDetails: DetailedAdvertisementResponse? =
-            intent.getParcelableExtra("advertisement_details")
+            intent.getParcelableExtra("advertisementDetails")
 
         advertisementDetails?.let {
             response = it
