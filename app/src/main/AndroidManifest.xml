@@ -32,6 +32,6 @@
         <activity android:name=".activities.RegisterActivity"/>
         <activity android:name=".activities.AddActivity" />
         <activity android:name=".activities.AdvertisementActivity" />
+        <activity android:name=".activities.MessageActivity"/>
     </application>
-
 </manifest>

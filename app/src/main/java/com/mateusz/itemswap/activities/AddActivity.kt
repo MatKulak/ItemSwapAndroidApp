@@ -28,9 +28,11 @@ import com.mateusz.itemswap.helpers.PreferencesHelper
 import com.mateusz.itemswap.network.APIAdvertisement
 import com.mateusz.itemswap.utils.RetrofitClient
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
+import okio.source
 import retrofit2.Call
 import java.io.InputStream
 
@@ -238,11 +240,11 @@ class AddActivity : AppCompatActivity() {
 
         val requestFile = object : RequestBody() {
             override fun contentType(): MediaType? {
-                return MediaType.parse("image/*")
+                return "image/*".toMediaTypeOrNull()
             }
 
             override fun writeTo(sink: okio.BufferedSink) {
-                inputStream?.use { sink.writeAll(okio.Okio.source(it)) }
+                inputStream?.use { sink.writeAll(it.source()) }
             }
         }
 
@@ -269,7 +271,7 @@ class AddActivity : AppCompatActivity() {
     private fun createJsonRequestBody(addAdvertisementRequest: AddAdvertisementRequest): RequestBody {
         val gson = Gson()
         val jsonString = gson.toJson(addAdvertisementRequest)
-        return RequestBody.create(MediaType.parse("application/json"), jsonString)
+        return RequestBody.create("application/json".toMediaTypeOrNull(), jsonString)
     }
 
     private fun populateSpinnerCategories() {

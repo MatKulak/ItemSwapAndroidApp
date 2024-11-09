@@ -76,8 +76,11 @@ class AdvertisementActivity : AppCompatActivity() {
     }
 
     private fun sendMessage() {
-
+        val intent = Intent(this, MessageActivity::class.java)
+        intent.putExtra("advertisementDetails", response)
+        startActivity(intent)
     }
+
 
     private fun goBackToList() {
         val intent = Intent(this@AdvertisementActivity, MainActivity::class.java)

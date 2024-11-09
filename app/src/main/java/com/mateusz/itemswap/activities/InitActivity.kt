@@ -45,7 +45,7 @@ class InitActivity : AppCompatActivity() {
     }
 
     private fun redirectToLoginPage() {
-        preferencesHelper.clearAll() // Clear any existing token for a fresh login
+        preferencesHelper.clearAll()
         val intent = Intent(this@InitActivity, LoginActivity::class.java)
         startActivity(intent)
         finish()

@@ -58,4 +58,7 @@ dependencies {
     implementation(libs.paging.common)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.viewpager2)
+    implementation(libs.okhttp)
+//    implementation(libs.stompProtocolAndroid)
+//    implementation(libs.javaWebSocket)
 }
