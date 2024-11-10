@@ -50,7 +50,7 @@ class LoginActivity : AppCompatActivity() {
             override fun onResponse(call: Call<AuthenticationResponse>, response: Response<AuthenticationResponse>) {
                 if (response.isSuccessful) {
                     val token = response.body()?.token
-                    val userContext = response.body()?.user
+                    val userContext = response.body()?.userResponse
 
                     token?.let {
                         preferencesHelper.setJwtToken(token)

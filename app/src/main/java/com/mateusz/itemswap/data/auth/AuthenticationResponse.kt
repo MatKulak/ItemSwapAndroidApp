@@ -1,8 +1,8 @@
 package com.mateusz.itemswap.data.auth
 
-import com.mateusz.itemswap.data.user.User
+import com.mateusz.itemswap.data.user.UserResponse
 
 data class AuthenticationResponse(
     val token: String,
-    val user: User
+    val userResponse: UserResponse
 )

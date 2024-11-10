@@ -5,6 +5,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.gson.Gson
 import com.mateusz.itemswap.data.user.User
+import com.mateusz.itemswap.data.user.UserResponse
 
 class PreferencesHelper(context: Context) {
 
@@ -32,14 +33,14 @@ class PreferencesHelper(context: Context) {
         return sharedPreferences.getString("JWT_TOKEN", null)
     }
 
-    fun setUserContext(userContext: User) {
+    fun setUserContext(userContext: UserResponse) {
         val jsonString = gson.toJson(userContext)
         sharedPreferences.edit().putString("USER_CONTEXT", jsonString).apply()
     }
 
-    fun getUserContext(): User? {
+    fun getUserContext(): UserResponse? {
         val jsonString = sharedPreferences.getString("USER_CONTEXT", null)
-        return jsonString?.let { gson.fromJson(it, User::class.java) }
+        return jsonString?.let { gson.fromJson(it, UserResponse::class.java) }
     }
 
     fun removeKey(key: String) {

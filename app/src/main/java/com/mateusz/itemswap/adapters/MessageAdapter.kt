@@ -23,7 +23,8 @@ class MessageAdapter(private val messages: List<MessageResponse>) :
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         val message = messages[position]
-        holder.senderTextView.text = message.senderId.toString()  // Ideally, map senderId to name
+        val usernameString = message.senderUsername + ": "
+        holder.senderTextView.text = usernameString
         holder.contentTextView.text = message.content
     }
 
