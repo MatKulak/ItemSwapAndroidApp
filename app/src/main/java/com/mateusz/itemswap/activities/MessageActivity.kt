@@ -34,9 +34,9 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
     private lateinit var sendMessageButton: Button
     private lateinit var messageAdapter: MessageAdapter
 
-    private lateinit var advertisement: DetailedAdvertisementResponse
     private lateinit var apiConversation: APIConversation
     private lateinit var preferencesHelper: PreferencesHelper
+    private lateinit var advertisementDetails: DetailedAdvertisementResponse
 
     private lateinit var userId: UUID
     private var conversation: ConversationResponse? = null
@@ -53,8 +53,12 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
         apiConversation = RetrofitClient.getService(APIConversation::class.java, preferencesHelper)
         userId = preferencesHelper.getUserContext()?.id!!
         setConversationResponse()
-        setAdvertisement()
-        getInitialConversation()
+        setDetailedAdvertisementResponse()
+//        getConversationResponse()
+        messageAdapter = MessageAdapter(messages)
+        messagesRecyclerView.layoutManager = LinearLayoutManager(this)
+        messagesRecyclerView.adapter = messageAdapter
+        updateConversation()
         setChatTitle()
 //        WebSocketManager.setListener(this)
 //        WebSocketManager.connect()
@@ -62,9 +66,7 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
         sendMessageButton.setOnClickListener {
             sendMessage()
         }
-        messageAdapter = MessageAdapter(messages)
-        messagesRecyclerView.layoutManager = LinearLayoutManager(this)
-        messagesRecyclerView.adapter = messageAdapter
+
     }
 
     private fun setConversationResponse() {
@@ -76,6 +78,10 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
         }
     }
 
+    private fun setDetailedAdvertisementResponse() {
+        advertisementDetails = intent.getParcelableExtra("advertisementDetails") ?: return
+    }
+
     private fun sendMessage() {
         preferencesHelper.getUserContext()
         val content = messageEditText.text.toString()
@@ -83,7 +89,7 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
 
         val messageRequest = MessageRequest(
             conversation?.id,
-            advertisement.id,
+            advertisementDetails.id,
             userId,
             content
         )
@@ -91,16 +97,24 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
         messageEditText.setText("")
     }
 
-    private fun setAdvertisement() {
-        advertisement = intent.getParcelableExtra("advertisementDetails") ?: return
-    }
-
     private fun setChatTitle() {
-        advertisementTitleTextView.text = advertisement.title
+        advertisementTitleTextView.text = advertisementDetails.title
     }
 
-    private fun getInitialConversation() {
-        apiConversation.getConversationByAdvertisementId(advertisement.id).enqueue(object : Callback<ConversationResponse> {
+    private fun updateConversation() {
+        if (conversation == null) {
+            getConversationResponse()
+        } else {
+            runOnUiThread {
+                messages.clear()
+                conversation?.messages?.let { messages.addAll(it) }
+                messageAdapter.notifyDataSetChanged()
+            }
+        }
+    }
+
+    private fun getConversationResponse() {
+        apiConversation.getConversationByAdvertisementId(advertisementDetails.id, null).enqueue(object : Callback<ConversationResponse> {
             override fun onResponse(call: Call<ConversationResponse>, response: Response<ConversationResponse>) {
                 if (response.isSuccessful) {
                     val conversationResponse = response.body()

@@ -7,6 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".fragment.FindFragment">
 
+    <EditText
+        android:id="@+id/searchBarEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Search advertisements..."
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="16dp" />
+
     <FrameLayout
         android:id="@+id/advertisementsListContainer"
         android:layout_width="0dp"

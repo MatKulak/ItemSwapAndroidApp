@@ -43,7 +43,7 @@ class ConversationAdapter(
         holder.advertisementTitleTextView.text = conversation.advertisementTitle
 
         holder.itemView.setOnClickListener {
-            getAdvertisementDetails(conversation.advertisementId, holder.itemView.context)
+            getAdvertisementDetails(conversation, holder.itemView.context)
         }
     }
 
@@ -57,8 +57,8 @@ class ConversationAdapter(
         notifyItemRangeInserted(startPosition, newConversations.size)
     }
 
-    private fun getAdvertisementDetails(id: UUID, context: Context) {
-        apiAdvertisement.getAdvertisementById(id)
+    private fun getAdvertisementDetails(conversation: SimpleConversationResponse, context: Context) {
+        apiAdvertisement.getAdvertisementById(conversation.advertisementId)
             .enqueue(object : Callback<DetailedAdvertisementResponse> {
                 override fun onResponse(
                     call: Call<DetailedAdvertisementResponse>,
@@ -68,7 +68,7 @@ class ConversationAdapter(
                         val detailedAdvertisementResponse = response.body()
                         if (detailedAdvertisementResponse != null) {
                             advertisementDetails = detailedAdvertisementResponse
-                            getConversationDetails(id, context)
+                            getConversationDetails(conversation, context)
                         }
                     }
                 }
@@ -80,8 +80,8 @@ class ConversationAdapter(
             })
     }
 
-    private fun getConversationDetails(id: UUID, context: Context) {
-        apiConversation.getConversationByAdvertisementId(id)
+    private fun getConversationDetails(conversation: SimpleConversationResponse, context: Context) {
+        apiConversation.getConversationByAdvertisementId(conversation.advertisementId, conversation.participantId)
             .enqueue(object : Callback<ConversationResponse> {
                 override fun onResponse(
                     call: Call<ConversationResponse>,
