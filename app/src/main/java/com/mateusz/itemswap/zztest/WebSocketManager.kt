@@ -11,41 +11,40 @@ object WebSocketManager {
     private val client = OkHttpClient()
     private lateinit var webSocket: WebSocket
     private var isConnected = false
-    private var listener: WebSocketListener? = null
+//    private var listener: WebSocketListener? = null
+    private val listeners = mutableSetOf<WebSocketListener>()
 
-    fun setListener(listener: WebSocketListener) {
-        this.listener = listener
+//    fun setListener(listener: WebSocketListener) {
+//        this.listener = listener
+//    }
+
+    fun addListener(listener: WebSocketListener) {
+        listeners.add(listener)
+        if (isConnected) {
+            listener.onConnectionOpened()
+        }
     }
 
+    fun removeListener(listener: WebSocketListener) {
+        listeners.remove(listener)
+    }
+
+
     fun connect() {
-        if (isConnected) {
-            return
-        }
+        if (isConnected) return
 
         val request = Request.Builder().url(SERVER_URL).build()
         webSocket = client.newWebSocket(request, WebSocketListenerImpl(this))
         isConnected = true
     }
 
-//    fun connect(preferencesHelper: PreferencesHelper) {
-//        if (isConnected) return
-//
-//        val token = preferencesHelper.getJwtToken()
-//        val request = Request.Builder()
-//            .url(SERVER_URL)
-//            .header("Authorization", "Bearer $token")
-//            .build()
-//
-//        webSocket = client.newWebSocket(request, WebSocketListenerImpl(this))
-//        isConnected = true
-//    }
-
     fun disconnect() {
         if (isConnected) {
             webSocket.close(1000, "Disconnecting")
-            client.dispatcher.executorService.shutdown()
+//            client.dispatcher.executorService.shutdown()
             isConnected = false
-            listener?.onConnectionClosed()
+//            listener?.onConnectionClosed()
+            notifyOnConnectionClosed()
         }
     }
 
@@ -60,17 +59,21 @@ object WebSocketManager {
     }
 
     internal fun notifyOnOpen() {
-        listener?.onConnectionOpened()
+//        listener?.onConnectionOpened()
+        listeners.forEach { it.onConnectionOpened() }
         sendConnectFrame()
         subscribeToTopic()
     }
 
     internal fun notifyOnMessageReceived(message: String) {
-        listener?.onMessageReceived(message)
+        listeners.forEach { it.onMessageReceived(message) }
+
+//        listener?.onMessageReceived(message)
     }
 
     internal fun notifyOnConnectionClosed() {
-        listener?.onConnectionClosed()
+//        listener?.onConnectionClosed()
+        listeners.forEach { it.onConnectionClosed() }
     }
 
     private fun sendConnectFrame() {

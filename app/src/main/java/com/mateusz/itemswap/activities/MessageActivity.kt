@@ -52,17 +52,28 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
         preferencesHelper = PreferencesHelper(this)
         apiConversation = RetrofitClient.getService(APIConversation::class.java, preferencesHelper)
         userId = preferencesHelper.getUserContext()?.id!!
+        setConversationResponse()
         setAdvertisement()
         getInitialConversation()
         setChatTitle()
-        WebSocketManager.setListener(this)
-        WebSocketManager.connect()
+//        WebSocketManager.setListener(this)
+//        WebSocketManager.connect()
+        WebSocketManager.addListener(this)
         sendMessageButton.setOnClickListener {
             sendMessage()
         }
         messageAdapter = MessageAdapter(messages)
         messagesRecyclerView.layoutManager = LinearLayoutManager(this)
         messagesRecyclerView.adapter = messageAdapter
+    }
+
+    private fun setConversationResponse() {
+        val conversationResponse: ConversationResponse? =
+            intent.getParcelableExtra("conversation")
+
+        conversationResponse?.let {
+            conversation = it
+        }
     }
 
     private fun sendMessage() {
@@ -92,9 +103,9 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
         apiConversation.getConversationByAdvertisementId(advertisement.id).enqueue(object : Callback<ConversationResponse> {
             override fun onResponse(call: Call<ConversationResponse>, response: Response<ConversationResponse>) {
                 if (response.isSuccessful) {
-                    val response = response.body()
-                    response?.let {
-                        conversation = response
+                    val conversationResponse = response.body()
+                    conversationResponse?.let {
+                        conversation = conversationResponse
                         populateInitialMessages()
                     }
                 }

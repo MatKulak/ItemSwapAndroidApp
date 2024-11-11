@@ -13,6 +13,7 @@ import com.mateusz.itemswap.activities.LoginActivity
 import com.mateusz.itemswap.helpers.PreferencesHelper
 import com.mateusz.itemswap.network.APIAuthenticate
 import com.mateusz.itemswap.utils.RetrofitClient
+import com.mateusz.itemswap.zztest.WebSocketManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -51,6 +52,7 @@ class AccountFragment : Fragment() {
                     val intent = Intent(requireContext(), LoginActivity::class.java)
                     startActivity(intent)
                     requireActivity().finish()
+                    WebSocketManager.disconnect()
                 } else {
                     Toast.makeText(requireContext(), "Failed to logout, please try again.", Toast.LENGTH_SHORT).show()
                 }

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.mateusz.itemswap.helpers.PreferencesHelper
 import com.mateusz.itemswap.network.APIAuthenticate
 import com.mateusz.itemswap.utils.RetrofitClient
+import com.mateusz.itemswap.zztest.WebSocketManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -39,6 +40,7 @@ class InitActivity : AppCompatActivity() {
     }
 
     private fun redirectToMainActivity() {
+        WebSocketManager.connect()
         val intent = Intent(this@InitActivity, MainActivity::class.java)
         startActivity(intent)
         finish()
