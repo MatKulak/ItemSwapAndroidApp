@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.mateusz.itemswap.R
@@ -23,6 +24,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var usernameEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
+    private lateinit var registerTextView: TextView
     private lateinit var apiAuthenticate: APIAuthenticate
     private lateinit var preferencesHelper: PreferencesHelper
 
@@ -34,11 +36,16 @@ class LoginActivity : AppCompatActivity() {
         usernameEditText = findViewById(R.id.usernameEditText)
         passwordEditText = findViewById(R.id.passwordEditText)
         loginButton = findViewById(R.id.loginButton)
+        registerTextView = findViewById(R.id.registerTextView)
         apiAuthenticate = RetrofitClient.getService(APIAuthenticate::class.java, preferencesHelper)
         preferencesHelper.clearAll();
 
         loginButton.setOnClickListener {
             login()
+        }
+
+        registerTextView.setOnClickListener {
+            register()
         }
     }
 
@@ -77,5 +84,10 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    private fun register() {
+        val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
+        startActivity(intent)
     }
 }
