@@ -67,6 +67,11 @@ class AdvertisementAdapter(private val advertisements: MutableList<Advertisement
         notifyItemRangeInserted(startPosition, newAdvertisements.size)
     }
 
+    fun clearItems() {
+        advertisements.clear()
+        notifyDataSetChanged()
+    }
+
     private fun getAdvertisementDetails(id: UUID, context: Context) {
         apiAdvertisement.getAdvertisementById(id).enqueue(object : Callback<DetailedAdvertisementResponse> {
             override fun onResponse(call: Call<DetailedAdvertisementResponse>, response: Response<DetailedAdvertisementResponse>) {

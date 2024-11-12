@@ -81,6 +81,14 @@ class AdvertisementsListFragment : Fragment() {
         return view
     }
 
+    fun updateParams(newParams: Map<String, String>) {
+        params = updateParams(params, newParams)
+        currentPage = 0
+        isLastPage = false
+        advertisementAdapter.clearItems()  // Add a function in the adapter to clear current items
+        fetchAdvertisementsFromBackend(currentPage)
+    }
+
     private fun setupScrollListener() {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

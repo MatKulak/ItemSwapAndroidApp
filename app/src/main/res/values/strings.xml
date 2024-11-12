@@ -4,7 +4,7 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm password</string>
-    <string name="register">Register</string>
+    <string name="register"><u>Don\'t have an account? Sign up</u></string>
     <string name="name">Name</string>
     <string name="surname">Surname</string>
     <string name="username">Username</string>
@@ -23,4 +23,6 @@
     <string name="send_message">Send Message</string>
     <string name="follow">Follow</string>
     <string name="call">Call</string>
+    <string name="search_advertisements">Search advertisements</string>
+    <string name="search">Search</string>
 </resources>
