@@ -26,4 +26,15 @@
     <string name="search_advertisements">Search advertisements</string>
     <string name="search">Search</string>
     <string name="hint_text">Hint</string>
+    <string name="errorNameRequired">Name required</string>
+    <string name="errorSurnameRequired">Surname required</string>
+    <string name="errorUsernameRequired">Username required</string>
+    <string name="errorPhoneRequired">Phone number required</string>
+    <string name="errorEmailRequired">Email required</string>
+    <string name="errorPasswordRequired">Password required</string>
+    <string name="errorConfirmPasswordRequired">Confirm password required</string>
+    <string name="firstName">First name</string>
+    <string name="lastName">Last name</string>
+    <string name="signUp">Sign up</string>
+    <string name="registerTitle">Register</string>
 </resources>

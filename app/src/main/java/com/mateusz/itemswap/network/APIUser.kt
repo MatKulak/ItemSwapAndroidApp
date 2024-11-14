@@ -11,7 +11,4 @@ interface APIUser {
 
     @POST("/api/users/validate")
     fun validate(@Body validationRequest: SimpleValidationRequest): Call<Boolean>
-
-    @POST("/api/users/register")
-    fun register(@Body registerRequest: RegisterRequest): Call<User>
 }

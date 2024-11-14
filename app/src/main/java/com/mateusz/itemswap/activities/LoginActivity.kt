@@ -12,12 +12,13 @@ import com.mateusz.itemswap.data.auth.LoginRequest
 import com.mateusz.itemswap.data.auth.AuthenticationResponse
 import com.mateusz.itemswap.helpers.PreferencesHelper
 import com.mateusz.itemswap.network.APIAuthenticate
+import com.mateusz.itemswap.others.Constants.CONNECTION_ERROR
+import com.mateusz.itemswap.others.Constants.INVALID_CREDENTIALS
 import com.mateusz.itemswap.utils.RetrofitClient
 import com.mateusz.itemswap.zztest.WebSocketManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
 
 class LoginActivity : AppCompatActivity() {
 
@@ -72,16 +73,12 @@ class LoginActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                 } else {
-                    runOnUiThread {
-                        Toast.makeText(this@LoginActivity, "Invalid credentials", Toast.LENGTH_SHORT).show()
-                    }
+                    showToast(INVALID_CREDENTIALS)
                 }
             }
 
             override fun onFailure(call: Call<AuthenticationResponse>, t: Throwable) {
-                runOnUiThread {
-                    Toast.makeText(this@LoginActivity, "Internal server error", Toast.LENGTH_SHORT).show()
-                }
+                showToast(CONNECTION_ERROR)
             }
         })
     }
@@ -89,5 +86,9 @@ class LoginActivity : AppCompatActivity() {
     private fun register() {
         val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this@LoginActivity, message, Toast.LENGTH_SHORT).show()
     }
 }

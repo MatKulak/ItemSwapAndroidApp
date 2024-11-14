@@ -1,373 +1,296 @@
 package com.mateusz.itemswap.activities
 
-import android.content.res.ColorStateList
-import android.graphics.Color
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Patterns
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.textfield.TextInputLayout
 import com.mateusz.itemswap.R
+import com.mateusz.itemswap.data.auth.AuthenticationResponse
 import com.mateusz.itemswap.data.auth.RegisterRequest
-import com.mateusz.itemswap.data.user.User
-import com.mateusz.itemswap.databinding.ActivityRegisterBinding
+import com.mateusz.itemswap.data.others.SimpleValidationRequest
 import com.mateusz.itemswap.helpers.PreferencesHelper
-import com.mateusz.itemswap.utils.RetrofitClient
+import com.mateusz.itemswap.network.APIAuthenticate
 import com.mateusz.itemswap.network.APIUser
+import com.mateusz.itemswap.others.Constants.CONNECTION_ERROR
+import com.mateusz.itemswap.others.Constants.EMAIL_ALREADY_TAKEN
+import com.mateusz.itemswap.others.Constants.EMAIL_FORMAT_VALIDATION_ERROR
+import com.mateusz.itemswap.others.Constants.FIRST_NAME_VALIDATION_ERROR
+import com.mateusz.itemswap.others.Constants.INVALID_FORM
+import com.mateusz.itemswap.others.Constants.LAST_NAME_VALIDATION_ERROR
+import com.mateusz.itemswap.others.Constants.PASSWORD_LENGTH_VALIDATION_ERROR
+import com.mateusz.itemswap.others.Constants.PHONE_NUMBER_ALREADY_TAKEN
+import com.mateusz.itemswap.others.Constants.PHONE_NUMBER_LENGTH_VALIDATION_ERROR
+import com.mateusz.itemswap.others.Constants.REQUIRED_FIELD
+import com.mateusz.itemswap.others.Constants.SERVER_ERROR
+import com.mateusz.itemswap.others.Constants.USERNAME_ALREADY_TAKEN
+import com.mateusz.itemswap.others.Constants.USERNAME_LENGTH_VALIDATION_ERROR
+import com.mateusz.itemswap.utils.RetrofitClient
+import com.mateusz.itemswap.zztest.WebSocketManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class RegisterActivity : AppCompatActivity(), View.OnClickListener, View.OnFocusChangeListener, View.OnKeyListener {
+class RegisterActivity : AppCompatActivity() {
 
-    private lateinit var mBinding: ActivityRegisterBinding
-    private lateinit var apiService: APIUser
+    private lateinit var firstNameTextField: TextInputLayout
+    private lateinit var lastNameTextField: TextInputLayout
+    private lateinit var usernameTextField: TextInputLayout
+    private lateinit var phoneNumberTextField: TextInputLayout
+    private lateinit var emailTextField: TextInputLayout
+    private lateinit var passwordTextField: TextInputLayout
+    private lateinit var signUpButton: Button
     private lateinit var preferencesHelper: PreferencesHelper
+    private lateinit var apiUser: APIUser
+    private lateinit var apiAuthenticate: APIAuthenticate
 
-
+    private val debounceHandler = Handler(Looper.getMainLooper())
+    private var validationRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mBinding = ActivityRegisterBinding.inflate(LayoutInflater.from(this))
-        setContentView(mBinding.root)
+        setContentView(R.layout.activity_register)
+
+        firstNameTextField = findViewById(R.id.firstNameTextField)
+        lastNameTextField = findViewById(R.id.lastNameTextField)
+        usernameTextField = findViewById(R.id.usernameTextField)
+        phoneNumberTextField = findViewById(R.id.phoneNumberTextField)
+        emailTextField = findViewById(R.id.emailTextField)
+        passwordTextField = findViewById(R.id.passwordTestField)
+        signUpButton = findViewById(R.id.signUpButton)
         preferencesHelper = PreferencesHelper(this)
+        apiUser = RetrofitClient.getService(APIUser::class.java, preferencesHelper)
+        apiAuthenticate = RetrofitClient.getService(APIAuthenticate::class.java, preferencesHelper)
 
-        apiService = RetrofitClient.getService(APIUser::class.java, preferencesHelper)
-
-        mBinding.nameEt.onFocusChangeListener = this
-        mBinding.surnameEt.onFocusChangeListener = this
-        mBinding.usernameEt.onFocusChangeListener = this
-        mBinding.phoneNumberEt.onFocusChangeListener = this
-        mBinding.emailEt.onFocusChangeListener = this
-        mBinding.passwordEt.onFocusChangeListener = this
-        mBinding.confirmPasswordEt.onFocusChangeListener = this
-
-        prepareTextChangeListener()
-        mBinding.registerBtn.setOnClickListener(this)
+        watchUsernameChange()
+        watchFirstNameChange()
+        watchLastNameChange()
+        watchPhoneNumberChange()
+        watchEmailChange()
+        watchPasswordChange()
+        signUpButton.setOnClickListener {
+            register()
+        }
     }
 
-    private fun registerUser() {
-        val name = mBinding.nameEt.text.toString()
-        val surname = mBinding.surnameEt.text.toString()
-        val username = mBinding.usernameEt.text.toString()
-        val phoneNumber = mBinding.phoneNumberEt.text.toString()
-        val email = mBinding.emailEt.text.toString()
-        val password = mBinding.passwordEt.text.toString()
-        val confirmPassword = mBinding.confirmPasswordEt.text.toString()
+    private fun watchFirstNameChange() {
+        firstNameTextField.editText?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-        val registerRequest = RegisterRequest(
-            name = name,
-            surname = surname,
-            username = username,
-            phoneNumber = phoneNumber,
-            email = email,
-            password = password,
-            confirmPassword = confirmPassword
-        )
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
-        // Make API call using Retrofit
-        val call = apiService.register(registerRequest)
-        call.enqueue(object : Callback<User> {
-            override fun onResponse(call: Call<User>, response: Response<User>) {
+            override fun afterTextChanged(s: Editable?) {
+                val inputLength = s?.length ?: 0
+                if (inputLength < 3) firstNameTextField.error = FIRST_NAME_VALIDATION_ERROR
+                else firstNameTextField.error = null
+            }
+        })
+    }
+
+    private fun watchLastNameChange() {
+        lastNameTextField.editText?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val inputLength = s?.length ?: 0
+                if (inputLength < 3) lastNameTextField.error = LAST_NAME_VALIDATION_ERROR
+                else lastNameTextField.error = null
+            }
+        })
+    }
+
+    private fun watchPasswordChange() {
+        passwordTextField.editText?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val inputLength = s?.length ?: 0
+                if (inputLength < 6) passwordTextField.error = PASSWORD_LENGTH_VALIDATION_ERROR
+                else passwordTextField.error = null
+            }
+        })
+    }
+
+    private fun watchUsernameChange() {
+        usernameTextField.editText?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val username = s?.toString()
+
+                if (username.isNullOrEmpty() || username.length < 3) {
+                    usernameTextField.error = USERNAME_LENGTH_VALIDATION_ERROR
+                    return
+                } else {
+                    usernameTextField.error = null
+                }
+
+                validationRunnable?.let { debounceHandler.removeCallbacks(it) }
+                validationRunnable = Runnable {
+                    val validationRequest = SimpleValidationRequest("username", username)
+                    validateFormField(validationRequest, usernameTextField, USERNAME_ALREADY_TAKEN)
+                }
+                debounceHandler.postDelayed(validationRunnable!!, 300L)
+            }
+        })
+    }
+
+    private fun validateFormField(
+        validationRequest: SimpleValidationRequest,
+        textField: TextInputLayout,
+        validationFailedMessage: String
+    ) {
+        apiUser.validate(validationRequest).enqueue(object : Callback<Boolean> {
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
                 if (response.isSuccessful) {
-                    val user = response.body()
+                    val isValid = response.body() ?: false
                     runOnUiThread {
-                        Toast.makeText(this@RegisterActivity, "Registration successful! Welcome, ${user?.name}", Toast.LENGTH_LONG).show()
-                        // You can navigate to the next activity here
+                        textField.error = if (!isValid) null else validationFailedMessage
                     }
                 } else {
-                    // Handle unsuccessful response, such as a 4xx or 5xx response code
-                    runOnUiThread {
-                        Toast.makeText(this@RegisterActivity, "Registration failed: ${response.message()}", Toast.LENGTH_LONG).show()
-                    }
+                    textField.error = validationFailedMessage
+                    showToast(SERVER_ERROR)
                 }
             }
 
-            override fun onFailure(call: Call<User>, t: Throwable) {
-                // Handle failure, such as a network error or serialization issue
-                runOnUiThread {
-                    Toast.makeText(this@RegisterActivity, "Error: ${t.message}", Toast.LENGTH_LONG).show()
-                }
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                textField.error = validationFailedMessage
+                showToast(CONNECTION_ERROR)
             }
         })
     }
 
-    private fun prepareTextChangeListener() {
-        mBinding.passwordEt.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                validatePasswordAndConfirmPassword()
-                if (!validatePasswordAndConfirmPassword()) {
-                    mBinding.confirmPasswordTil.startIconDrawable = null
-                }
-            }
-
+    private fun watchPhoneNumberChange() {
+        phoneNumberTextField.editText?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
 
-        mBinding.confirmPasswordEt.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                if (validatePasswordAndConfirmPassword()) {
-                    mBinding.confirmPasswordTil.apply {
-                        setStartIconDrawable(R.drawable.check_circle_24)
-                        setStartIconTintList(ColorStateList.valueOf(Color.GREEN))
-                    }
-                } else {
-                    mBinding.confirmPasswordTil.apply {
-                        startIconDrawable = null
-                    }
-                }
-            }
+                val phoneNumber = s?.toString()
 
+                if (phoneNumber.isNullOrEmpty() || phoneNumber.length != 9) {
+                    phoneNumberTextField.error = PHONE_NUMBER_LENGTH_VALIDATION_ERROR
+                    return
+                } else {
+                    phoneNumberTextField.error = null
+                }
+
+                validationRunnable?.let { debounceHandler.removeCallbacks(it) }
+                validationRunnable = Runnable {
+                    val validationRequest = SimpleValidationRequest("phoneNumber", phoneNumber)
+                    validateFormField(validationRequest, phoneNumberTextField, PHONE_NUMBER_ALREADY_TAKEN)
+                }
+                debounceHandler.postDelayed(validationRunnable!!, 300L)
+            }
+        })
+    }
+
+    private fun watchEmailChange() {
+        emailTextField.editText?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val email = s?.toString()
+
+                if (email.isNullOrEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    emailTextField.error = EMAIL_FORMAT_VALIDATION_ERROR
+                    return
+                } else {
+                    emailTextField.error = null
+                }
+
+                validationRunnable?.let { debounceHandler.removeCallbacks(it) }
+                validationRunnable = Runnable {
+                    val validationRequest = SimpleValidationRequest("email", email)
+                    validateFormField(validationRequest, emailTextField, EMAIL_ALREADY_TAKEN)
+                }
+                debounceHandler.postDelayed(validationRunnable!!, 300L)
+            }
         })
     }
 
-    private fun validateName(): Boolean {
-        var errorMessage: String? = null
-        val value: String = mBinding.nameEt.text.toString()
-        if (value.isEmpty()) errorMessage = "Name is required"
+    private fun showToast(message: String) {
+        Toast.makeText(this@RegisterActivity, message, Toast.LENGTH_SHORT).show()
+    }
 
-        if (errorMessage != null) {
-            mBinding.nameTil.apply {
-                isErrorEnabled = true
-                error = errorMessage
-            }
+    private fun register() {
+        listOf(firstNameTextField, lastNameTextField, usernameTextField, phoneNumberTextField, emailTextField, passwordTextField).forEach { field ->
+            if (getStringValue(field).isEmpty()) field.error = REQUIRED_FIELD
         }
 
-        return errorMessage == null
-    }
-
-    private fun validateSurname(): Boolean {
-        var errorMessage: String? = null
-        val value: String = mBinding.surnameEt.text.toString()
-        if (value.isEmpty()) errorMessage = "Surname is required"
-
-        if (errorMessage != null) {
-            mBinding.surnameTil.apply {
-                isErrorEnabled = true
-                error = errorMessage
-            }
+        if (!(isValid(firstNameTextField) &&
+            isValid(lastNameTextField) &&
+            isValid(usernameTextField) &&
+            isValid(phoneNumberTextField) &&
+            isValid(emailTextField) &&
+            isValid(passwordTextField))) {
+            showToast(INVALID_FORM)
+            return
         }
 
-        return errorMessage == null
+        createNewUser(prepareRegisterRequest())
     }
 
-    private fun validateUsername(): Boolean {
-        var errorMessage: String? = null
-        val value: String = mBinding.usernameEt.text.toString()
-        if (value.isEmpty()) errorMessage = "Username is required"
+    private fun createNewUser(registerRequest: RegisterRequest) {
+        apiAuthenticate.register(registerRequest).enqueue(object : Callback<AuthenticationResponse> {
+            override fun onResponse(call: Call<AuthenticationResponse>, response: Response<AuthenticationResponse>) {
+                if (response.isSuccessful) {
+                    val token = response.body()?.token
+                    val userContext = response.body()?.userResponse
 
-        if (errorMessage != null) {
-            mBinding.usernameTil.apply {
-                isErrorEnabled = true
-                error = errorMessage
-            }
-        }
-
-        return errorMessage == null
-    }
-
-    private fun validatePhoneNumber(): Boolean {
-        var errorMessage: String? = null
-        val value: String = mBinding.phoneNumberEt.text.toString()
-        if (value.isEmpty()) errorMessage = "Phone number is required"
-
-        if (errorMessage != null) {
-            mBinding.phoneNumberTil.apply {
-                isErrorEnabled = true
-                error = errorMessage
-            }
-        }
-
-        return errorMessage == null
-    }
-
-    private fun validateEmail(): Boolean {
-        var errorMessage: String? = null
-        val value: String = mBinding.emailEt.text.toString()
-        if (value.isEmpty())
-            errorMessage = "Email is required"
-        else if (!Patterns.EMAIL_ADDRESS.matcher(value).matches())
-            errorMessage = "Email address in invalid"
-
-        if (errorMessage != null) {
-            mBinding.emailTil.apply {
-                isErrorEnabled = true
-                error = errorMessage
-            }
-        }
-
-        return errorMessage == null
-    }
-
-    private fun validatePassword(): Boolean {
-        var errorMessage: String? = null
-        val value: String = mBinding.passwordEt.text.toString()
-        if (value.isEmpty())
-            errorMessage = "Password is required"
-        else if (value.length < 6)
-            errorMessage = "Password must be 6 characters long"
-
-        if (errorMessage != null) {
-            mBinding.passwordTil.apply {
-                isErrorEnabled = true
-                error = errorMessage
-            }
-        }
-
-        return errorMessage == null
-    }
-
-    private fun validateConfirmPassword(): Boolean {
-        var errorMessage: String? = null
-        val value: String = mBinding.passwordEt.text.toString()
-        if (value.isEmpty())
-            errorMessage = "Confirm password is required"
-        else if (value.length < 6)
-            errorMessage = "Confirm password must be 6 characters long"
-
-        if (errorMessage != null) {
-            mBinding.confirmPasswordTil.apply {
-                isErrorEnabled = true
-                error = errorMessage
-            }
-        }
-
-        return errorMessage == null
-    }
-
-    private fun validatePasswordAndConfirmPassword(): Boolean {
-        val password = mBinding.passwordEt.text.toString()
-        val confirmPassword = mBinding.confirmPasswordEt.text.toString()
-
-        return if (password != confirmPassword) {
-            mBinding.confirmPasswordTil.apply {
-                isErrorEnabled = true
-                error = "Confirm password doesn't match with password"
-            }
-            false
-        } else {
-            mBinding.confirmPasswordTil.apply {
-                isErrorEnabled = false
-                error = null
-            }
-            true
-        }
-    }
-
-
-
-    override fun onClick(view: View?) {
-        if (view?.id == R.id.registerBtn) {
-            // Validate inputs before registering
-            if (validateAllFields()) {
-                registerUser()
-            }
-        }
-    }
-
-    private fun validateAllFields(): Boolean {
-        return validateName() && validateSurname() && validateUsername() &&
-                validatePhoneNumber() && validateEmail() && validatePassword() &&
-                validateConfirmPassword() && validatePasswordAndConfirmPassword()
-    }
-
-    override fun onFocusChange(view: View?, hasFocus: Boolean) {
-        if (view != null) {
-            when(view.id) {
-                R.id.nameEt -> {
-                    if (hasFocus) {
-                        if(mBinding.nameTil.isErrorEnabled) {
-                            mBinding.nameTil.isErrorEnabled = false
-                        }
-                    } else {
-                        validateName()
+                    token?.let {
+                        preferencesHelper.setJwtToken(token)
                     }
-                }
-                R.id.surnameEt -> {
-                    if (hasFocus) {
-                        if(mBinding.surnameTil.isErrorEnabled) {
-                            mBinding.surnameTil.isErrorEnabled = false
-                        }
-                    } else {
-                        validateSurname()
+                    userContext?.let {
+                        preferencesHelper.setUserContext(userContext)
                     }
-                }
-                R.id.usernameEt -> {
-                    if (hasFocus) {
-                        if(mBinding.usernameTil.isErrorEnabled) {
-                            mBinding.usernameTil.isErrorEnabled = false
-                        }
-                    } else {
-                        validateUsername()
-                    }
-                }
-                R.id.phoneNumberEt -> {
-                    if (hasFocus) {
-                        if(mBinding.phoneNumberTil.isErrorEnabled) {
-                            mBinding.phoneNumberTil.isErrorEnabled = false
-                        }
-                    } else {
-                        validatePhoneNumber()
-                    }
-                }
-                R.id.emailEt -> {
-                    if (hasFocus) {
-                        if(mBinding.emailTil.isErrorEnabled) {
-                            mBinding.emailTil.isErrorEnabled = false
-                        }
-                    } else {
-                        validateEmail()
-                    }
-                }
-                R.id.passwordEt -> {
-                    if (hasFocus) {
-                        if(mBinding.passwordTil.isErrorEnabled) {
-                            mBinding.passwordTil.isErrorEnabled = false
-                        }
-                    } else {
-                        if (validatePassword() && mBinding.confirmPasswordEt.text!!.isNotEmpty() &&
-                            validateConfirmPassword() && validatePasswordAndConfirmPassword()) {
-                            if (mBinding.confirmPasswordTil.isErrorEnabled) {
-                                mBinding.confirmPasswordTil.isErrorEnabled = false
-                            }
-                            mBinding.confirmPasswordTil.apply {
-                                setStartIconDrawable(R.drawable.check_circle_24)
-                                setStartIconTintList(ColorStateList.valueOf(Color.GREEN))
-                            }
-                        }
-                    }
-                }
-                R.id.confirmPasswordEt -> {
-                    if (hasFocus) {
-                        if(mBinding.confirmPasswordTil.isErrorEnabled) {
-                            mBinding.confirmPasswordTil.isErrorEnabled = false
-                        }
-                    } else {
-                        if (validateConfirmPassword() && validatePassword() && validatePasswordAndConfirmPassword()) {
-                            if (mBinding.passwordTil.isErrorEnabled) {
-                                mBinding.passwordTil.isErrorEnabled = false
-                            }
-                            mBinding.confirmPasswordTil.apply {
-                                setStartIconDrawable(R.drawable.check_circle_24)
-                                setStartIconTintList(ColorStateList.valueOf(Color.GREEN))
-                            }                        }
-                    }
+
+                    WebSocketManager.connect()
+                    val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    showToast(SERVER_ERROR)
                 }
             }
-        }
 
+            override fun onFailure(call: Call<AuthenticationResponse>, t: Throwable) {
+                showToast(CONNECTION_ERROR)
+            }
+        })
     }
 
-    override fun onKey(view: View?, event: Int, keyEvent: KeyEvent?): Boolean {
-        return false
+    private fun prepareRegisterRequest(): RegisterRequest {
+        return RegisterRequest(
+            getStringValue(firstNameTextField),
+            getStringValue(lastNameTextField),
+            getStringValue(usernameTextField),
+            getStringValue(phoneNumberTextField),
+            getStringValue(emailTextField),
+            getStringValue(passwordTextField)
+        )
+    }
+
+    private fun getStringValue(field: TextInputLayout): String {
+        return field.editText?.text.toString()
+    }
+
+    private fun isValid(field: TextInputLayout): Boolean {
+        return field.error == null
     }
 }
