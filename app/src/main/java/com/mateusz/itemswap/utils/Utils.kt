@@ -1,6 +1,7 @@
 package com.mateusz.itemswap.utils
 
 import android.util.Base64
+import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
@@ -53,5 +54,13 @@ object Utils {
         } catch (e: Exception) {
             false
         }
+    }
+
+    fun getTextFieldStringValue(field: TextInputLayout): String {
+        return field.editText?.text.toString()
+    }
+
+    fun isTextFieldValid(field: TextInputLayout): Boolean {
+        return field.error == null
     }
 }

@@ -32,6 +32,8 @@ import com.mateusz.itemswap.others.Constants.SERVER_ERROR
 import com.mateusz.itemswap.others.Constants.USERNAME_ALREADY_TAKEN
 import com.mateusz.itemswap.others.Constants.USERNAME_LENGTH_VALIDATION_ERROR
 import com.mateusz.itemswap.utils.RetrofitClient
+import com.mateusz.itemswap.utils.Utils.getTextFieldStringValue
+import com.mateusz.itemswap.utils.Utils.isTextFieldValid
 import com.mateusz.itemswap.zztest.WebSocketManager
 import retrofit2.Call
 import retrofit2.Callback
@@ -230,15 +232,15 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun register() {
         listOf(firstNameTextField, lastNameTextField, usernameTextField, phoneNumberTextField, emailTextField, passwordTextField).forEach { field ->
-            if (getStringValue(field).isEmpty()) field.error = REQUIRED_FIELD
+            if (getTextFieldStringValue(field).isEmpty()) field.error = REQUIRED_FIELD
         }
 
-        if (!(isValid(firstNameTextField) &&
-            isValid(lastNameTextField) &&
-            isValid(usernameTextField) &&
-            isValid(phoneNumberTextField) &&
-            isValid(emailTextField) &&
-            isValid(passwordTextField))) {
+        if (!(isTextFieldValid(firstNameTextField) &&
+            isTextFieldValid(lastNameTextField) &&
+            isTextFieldValid(usernameTextField) &&
+            isTextFieldValid(phoneNumberTextField) &&
+            isTextFieldValid(emailTextField) &&
+            isTextFieldValid(passwordTextField))) {
             showToast(INVALID_FORM)
             return
         }
@@ -277,20 +279,12 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun prepareRegisterRequest(): RegisterRequest {
         return RegisterRequest(
-            getStringValue(firstNameTextField),
-            getStringValue(lastNameTextField),
-            getStringValue(usernameTextField),
-            getStringValue(phoneNumberTextField),
-            getStringValue(emailTextField),
-            getStringValue(passwordTextField)
+            getTextFieldStringValue(firstNameTextField),
+            getTextFieldStringValue(lastNameTextField),
+            getTextFieldStringValue(usernameTextField),
+            getTextFieldStringValue(phoneNumberTextField),
+            getTextFieldStringValue(emailTextField),
+            getTextFieldStringValue(passwordTextField)
         )
-    }
-
-    private fun getStringValue(field: TextInputLayout): String {
-        return field.editText?.text.toString()
-    }
-
-    private fun isValid(field: TextInputLayout): Boolean {
-        return field.error == null
     }
 }

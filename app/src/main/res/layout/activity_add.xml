@@ -1,181 +1,187 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="25dp">
 
-    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/closeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_back" />
+        android:orientation="vertical"
+        android:spacing="16dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="@string/add_advertisement"
-            android:textSize="18sp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/addAdvertisement"
+            android:textSize="20sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="@string/addPhotos"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:id="@+id/imageSelectionBox"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/addImageIcon"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:contentDescription="@string/addPhotos"
+                android:src="@drawable/ic_add" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/category"
+            android:textSize="18sp" />
+
+        <Spinner
+            android:id="@+id/categorySpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:text="@string/condition"
+            android:textSize="18sp" />
+
+        <Spinner
+            android:id="@+id/conditionSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textSize="15sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/titleTextField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="@string/title"
+            app:boxBackgroundMode="filled"
+            app:counterEnabled="true"
+            app:counterMaxLength="255"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLength="255" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/descriptionTextField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="@string/description"
+            app:boxBackgroundMode="filled"
+            app:counterEnabled="true"
+            app:counterMaxLength="1023"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lines="5"
+                android:maxLength="1023"
+                android:minLines="5" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/cityTextField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="@string/city"
+            app:boxBackgroundMode="filled"
+            app:counterEnabled="true"
+            app:counterMaxLength="255"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLength="255" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/streetTextField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="@string/street"
+            app:boxBackgroundMode="filled"
+            app:counterEnabled="true"
+            app:counterMaxLength="255"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLength="255" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/postalCodeTextField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="@string/postalCode"
+            app:boxBackgroundMode="filled"
+            app:counterEnabled="true"
+            app:counterMaxLength="255"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLength="255" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/phoneNumberTextField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="@string/phoneNumber"
+            app:boxBackgroundMode="filled"
+            app:counterEnabled="true"
+            app:counterMaxLength="9"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="9" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/addBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/add" />
     </LinearLayout>
-
-    <!-- Add photos label -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/addPhotos"
-        android:textSize="15sp" />
-
-    <!-- Add Images Container -->
-    <LinearLayout
-        android:id="@+id/imageSelectionBox"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginTop="10dp"
-        android:gravity="center">
-
-        <ImageView
-            android:id="@+id/addImageIcon"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:contentDescription="@string/addPhotos"
-            android:src="@drawable/ic_add" />
-    </LinearLayout>
-
-    <!-- Title label -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/title"
-        android:textSize="15sp" />
-
-    <!-- Title EditText -->
-    <EditText
-        android:id="@+id/titleEt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:hint="@string/title"
-        android:textSize="15sp"
-        android:inputType="text"/>
-
-    <!-- Choose category label -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/chooseCategory"
-        android:textSize="15sp" />
-
-    <!-- Choose category spinner -->
-    <Spinner
-        android:id="@+id/categorySpinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:textSize="15sp"/>
-
-    <!-- Choose condition label -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/choose_condition"
-        android:textSize="15sp" />
-
-    <!-- Choose condition spinner -->
-    <Spinner
-        android:id="@+id/conditionSpinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:textSize="15sp"/>
-
-    <!-- Description label -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/description"
-        android:textSize="15sp" />
-
-    <!-- Description Text area -->
-    <EditText
-        android:id="@+id/descriptionEt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="top|start"
-        android:hint="@string/description"
-        android:inputType="textMultiLine"
-        android:maxLength="200"
-        android:maxLines="5"
-        android:minLines="3"
-        android:padding="10dp"
-        android:scrollbars="vertical"
-        android:layout_marginTop="10dp"
-        android:textSize="15sp" />
-
-    <!-- Contact header -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/contact"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginTop="10dp"/>
-
-    <!-- Localization label -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/localization"
-        android:textSize="15sp" />
-
-    <!-- Localization EditText -->
-    <EditText
-        android:id="@+id/localizationEt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:hint="@string/localization"
-        android:textSize="15sp"
-        android:inputType="text" />
-
-    <!-- Phone number label -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/phoneNumber"
-        android:textSize="15sp" />
-
-    <!-- Phone number EditText -->
-    <EditText
-        android:id="@+id/phoneNumberEt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:hint="@string/phoneNumber"
-        android:textSize="15sp"
-        android:inputType="number"/>
-
-    <Button
-        android:id="@+id/addBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/add" />
-
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>

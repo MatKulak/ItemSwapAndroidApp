@@ -37,4 +37,10 @@
     <string name="lastName">Last name</string>
     <string name="signUp">Sign up</string>
     <string name="registerTitle">Register</string>
+    <string name="addAdvertisement">Add advertisement</string>
+    <string name="condition">Condition</string>
+    <string name="category">Category</string>
+    <string name="city">City</string>
+    <string name="street">Street</string>
+    <string name="postalCode">Postal code</string>
 </resources>

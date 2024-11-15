@@ -8,10 +8,10 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Spinner
@@ -19,14 +19,29 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
 import com.mateusz.itemswap.R
 import com.mateusz.itemswap.data.advertisement.AddAdvertisementRequest
 import com.mateusz.itemswap.enums.Condition
-import com.mateusz.itemswap.enums.ProductCategories
 import com.mateusz.itemswap.helpers.PreferencesHelper
 import com.mateusz.itemswap.network.APIAdvertisement
+import com.mateusz.itemswap.network.APICategory
+import com.mateusz.itemswap.others.Constants.ADVERTISEMENT_ADD_SUCCESS
+import com.mateusz.itemswap.others.Constants.CITY_VALIDATION_ERROR
+import com.mateusz.itemswap.others.Constants.CONNECTION_ERROR
+import com.mateusz.itemswap.others.Constants.DESCRIPTION_VALIDATION_ERROR
+import com.mateusz.itemswap.others.Constants.IMAGE_VALIDATION_ERROR
+import com.mateusz.itemswap.others.Constants.INVALID_FORM
+import com.mateusz.itemswap.others.Constants.INVALID_PHONE_NUMBER
+import com.mateusz.itemswap.others.Constants.POSTAL_CODE_VALIDATION_ERROR
+import com.mateusz.itemswap.others.Constants.REQUIRED_FIELD
+import com.mateusz.itemswap.others.Constants.SERVER_ERROR
+import com.mateusz.itemswap.others.Constants.STREET_VALIDATION_ERROR
+import com.mateusz.itemswap.others.Constants.TITLE_VALIDATION_ERROR
 import com.mateusz.itemswap.utils.RetrofitClient
+import com.mateusz.itemswap.utils.Utils.getTextFieldStringValue
+import com.mateusz.itemswap.utils.Utils.isTextFieldValid
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -34,22 +49,27 @@ import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import okio.source
 import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.InputStream
 
 class AddActivity : AppCompatActivity() {
 
     private lateinit var imageSelectionBox: LinearLayout
     private lateinit var addImageIcon: ImageView
-    private lateinit var titleEditText: EditText
+    private lateinit var titleTextField: TextInputLayout
     private lateinit var categorySpinner: Spinner
     private lateinit var conditionSpinner: Spinner
-    private lateinit var descriptionEditText: EditText
-    private lateinit var localizationEditText: EditText
-    private lateinit var phoneNumberEditText: EditText
+    private lateinit var descriptionTextField: TextInputLayout
+    private lateinit var cityTextField: TextInputLayout
+    private lateinit var streetTextField: TextInputLayout
+    private lateinit var postalCodeTextField: TextInputLayout
+    private lateinit var phoneNumberTextField: TextInputLayout
+
     private lateinit var addButton: Button
-    private lateinit var closeButton: ImageButton
     private lateinit var preferencesHelper: PreferencesHelper
     private lateinit var apiAdvertisement: APIAdvertisement
+    private lateinit var apiCategory: APICategory
     private var selectedImages: MutableList<Uri> = mutableListOf()
 
     companion object {
@@ -63,16 +83,18 @@ class AddActivity : AppCompatActivity() {
 
         preferencesHelper = PreferencesHelper(this)
         apiAdvertisement = RetrofitClient.getService(APIAdvertisement::class.java, preferencesHelper)
+        apiCategory = RetrofitClient.getService(APICategory::class.java, preferencesHelper)
         imageSelectionBox = findViewById(R.id.imageSelectionBox)
         addImageIcon = findViewById(R.id.addImageIcon)
         categorySpinner = findViewById(R.id.categorySpinner)
         conditionSpinner = findViewById(R.id.conditionSpinner)
-        titleEditText = findViewById(R.id.titleEt)
-        descriptionEditText = findViewById(R.id.descriptionEt)
-        localizationEditText = findViewById(R.id.localizationEt)
-        phoneNumberEditText = findViewById(R.id.phoneNumberEt)
+        titleTextField = findViewById(R.id.titleTextField)
+        descriptionTextField = findViewById(R.id.descriptionTextField)
+        cityTextField = findViewById(R.id.cityTextField)
+        streetTextField = findViewById(R.id.streetTextField)
+        postalCodeTextField = findViewById(R.id.postalCodeTextField)
+        phoneNumberTextField = findViewById(R.id.phoneNumberTextField)
         addButton = findViewById(R.id.addBtn)
-        closeButton = findViewById(R.id.closeButton)
 
         populateSpinnerCategories()
         populateSpinnerConditions()
@@ -89,24 +111,34 @@ class AddActivity : AppCompatActivity() {
             addAdvertisement()
         }
 
-        closeButton.setOnClickListener {
-            onClose()
-        }
+        watchSimpleTextFieldChange(titleTextField, TITLE_VALIDATION_ERROR)
+        watchSimpleTextFieldChange(descriptionTextField, DESCRIPTION_VALIDATION_ERROR)
+        watchSimpleTextFieldChange(cityTextField, CITY_VALIDATION_ERROR)
+        watchSimpleTextFieldChange(streetTextField, STREET_VALIDATION_ERROR)
+        watchPhoneNumberChange()
+        watchPostalCodeChange()
+        watchPostalCodeChange()
     }
 
     private fun checkPermissionsAndOpenGallery() {
-        if (ContextCompat.checkSelfPermission(this, if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                Manifest.permission.READ_MEDIA_IMAGES
-            } else {
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            }) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
+        if (ContextCompat.checkSelfPermission(
                 this,
-                arrayOf(if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
                     Manifest.permission.READ_MEDIA_IMAGES
                 } else {
                     Manifest.permission.READ_EXTERNAL_STORAGE
-                }),
+                }
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        Manifest.permission.READ_MEDIA_IMAGES
+                    } else {
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    }
+                ),
                 REQUEST_CODE_READ_MEDIA_IMAGES
             )
         } else {
@@ -165,9 +197,11 @@ class AddActivity : AppCompatActivity() {
 
         for (imageUri in selectedImages) {
             val imageView = ImageView(this).apply {
-                layoutParams = LinearLayout.LayoutParams(imageSize, LinearLayout.LayoutParams.MATCH_PARENT).apply {
-                    setMargins(0, 0, 0, 0)
-                }
+                layoutParams =
+                    LinearLayout.LayoutParams(imageSize, LinearLayout.LayoutParams.MATCH_PARENT)
+                        .apply {
+                            setMargins(0, 0, 0, 0)
+                        }
                 setImageURI(imageUri)
                 scaleType = ImageView.ScaleType.CENTER_CROP
             }
@@ -181,20 +215,37 @@ class AddActivity : AppCompatActivity() {
     }
 
     private fun addAdvertisement() {
-        val addAdvertisementRequest = AddAdvertisementRequest(
-            titleEditText.text.toString(),
-            categorySpinner.selectedItem.toString(),
-            descriptionEditText.text.toString(),
-            localizationEditText.text.toString(),
-            phoneNumberEditText.text.toString()
-        )
-        uploadAdvertisementWithImages(this@AddActivity, selectedImages, addAdvertisementRequest)
-    }
+        listOf(titleTextField, descriptionTextField, cityTextField, streetTextField, postalCodeTextField).forEach { field ->
+            if (getTextFieldStringValue(field).isEmpty()) field.error = REQUIRED_FIELD
+        }
 
-    private fun onClose() {
-        val intent = Intent(this@AddActivity, MainActivity::class.java)
-        startActivity(intent)
-        finish()
+        if (!(isTextFieldValid(titleTextField) &&
+                    isTextFieldValid(descriptionTextField) &&
+                    isTextFieldValid(cityTextField) &&
+                    isTextFieldValid(streetTextField) &&
+                    isTextFieldValid(postalCodeTextField) &&
+                    isTextFieldValid(phoneNumberTextField))) {
+            showToast(INVALID_FORM)
+            return
+        }
+
+        if (selectedImages.size < 1) {
+            showToast(IMAGE_VALIDATION_ERROR)
+            return
+        }
+
+        val addAdvertisementRequest = AddAdvertisementRequest(
+            categorySpinner.selectedItem.toString(),
+            conditionSpinner.selectedItem.toString(),
+            getTextFieldStringValue(titleTextField),
+            getTextFieldStringValue(descriptionTextField),
+            getTextFieldStringValue(cityTextField),
+            getTextFieldStringValue(streetTextField),
+            getTextFieldStringValue(postalCodeTextField),
+            getTextFieldStringValue(phoneNumberTextField)
+        )
+
+        uploadAdvertisementWithImages(this@AddActivity, selectedImages, addAdvertisementRequest)
     }
 
     private fun uploadAdvertisementWithImages(
@@ -202,39 +253,36 @@ class AddActivity : AppCompatActivity() {
         uris: MutableList<Uri>,
         addAdvertisementRequest: AddAdvertisementRequest
     ) {
-        val fileParts = uris.map { uri -> prepareFilePart(context, "files", uri) }
+        val fileParts = uris.map { uri -> prepareFilePart(context, uri) }
         val jsonRequestBody = createJsonRequestBody(addAdvertisementRequest)
 
-        apiAdvertisement.uploadFiles(fileParts, jsonRequestBody).enqueue(object : retrofit2.Callback<ResponseBody> {
-            override fun onResponse(
-                call: Call<ResponseBody>,
-                response: retrofit2.Response<ResponseBody>
-            ) {
-                if (response.isSuccessful) {
-                    val intent = Intent(this@AddActivity, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
+        apiAdvertisement.uploadFiles(fileParts, jsonRequestBody)
+            .enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>
+                ) {
+                    if (response.isSuccessful) {
+                        val intent = Intent(this@AddActivity, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
 
-                    runOnUiThread {
-                        Toast.makeText(this@AddActivity, "Advertisement added successfully", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    runOnUiThread {
-                        Toast.makeText(this@AddActivity, "Error", Toast.LENGTH_SHORT).show()
+                        showToast(ADVERTISEMENT_ADD_SUCCESS)
+                    } else {
+                        showToast(SERVER_ERROR)
                     }
                 }
-            }
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                t.printStackTrace()
-                runOnUiThread {
-                    Toast.makeText(this@AddActivity, "Error", Toast.LENGTH_SHORT).show()
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    showToast(CONNECTION_ERROR)
                 }
-            }
-        })
+            })
     }
 
-    private fun prepareFilePart(context: Context, partName: String, fileUri: Uri): MultipartBody.Part {
+    private fun prepareFilePart(
+        context: Context,
+        fileUri: Uri
+    ): MultipartBody.Part {
         val inputStream: InputStream? = context.contentResolver.openInputStream(fileUri)
         val fileName = getFileName(context, fileUri)
 
@@ -248,7 +296,7 @@ class AddActivity : AppCompatActivity() {
             }
         }
 
-        return MultipartBody.Part.createFormData(partName, fileName, requestFile)
+        return MultipartBody.Part.createFormData("files", fileName, requestFile)
     }
 
     private fun getFileName(context: Context, uri: Uri): String {
@@ -275,10 +323,28 @@ class AddActivity : AppCompatActivity() {
     }
 
     private fun populateSpinnerCategories() {
-        val categories = ProductCategories.entries.map { it.name }
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        categorySpinner.adapter = adapter
+        apiCategory.getAll().enqueue(object : Callback<List<String>> {
+            override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
+                if (response.isSuccessful) {
+                    val categories = response.body() ?: emptyList()
+                    if (categories.isNotEmpty()) {
+                        val adapter = ArrayAdapter(
+                            this@AddActivity,
+                            android.R.layout.simple_spinner_item,
+                            categories
+                        )
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        categorySpinner.adapter = adapter
+                    }
+                } else {
+                    showToast(SERVER_ERROR)
+                }
+            }
+
+            override fun onFailure(call: Call<List<String>>, t: Throwable) {
+                showToast(CONNECTION_ERROR)
+            }
+        })
     }
 
     private fun populateSpinnerConditions() {
@@ -286,5 +352,61 @@ class AddActivity : AppCompatActivity() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, conditions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         conditionSpinner.adapter = adapter
+    }
+
+    private fun watchSimpleTextFieldChange(
+        inputLayout: TextInputLayout,
+        validationMessage: String
+    ) {
+        inputLayout.editText?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val inputLength = s?.length ?: 0
+                if (inputLength < 3) inputLayout.error = validationMessage
+                else inputLayout.error = null
+            }
+        })
+    }
+
+    private fun watchPostalCodeChange() {
+        postalCodeTextField.editText?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val postalCodeRegex = Regex("\\d{2}-\\d{3}")
+                val input = s?.toString() ?: ""
+                if (!postalCodeRegex.matches(input)) postalCodeTextField.error =
+                    POSTAL_CODE_VALIDATION_ERROR
+                else postalCodeTextField.error = null
+            }
+        })
+    }
+
+    private fun watchPhoneNumberChange() {
+        phoneNumberTextField.editText?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val phoneNumber = s?.toString()
+
+                if (phoneNumber.isNullOrEmpty() || phoneNumber.length == 9) {
+                    phoneNumberTextField.error = null
+                } else {
+                    phoneNumberTextField.error = INVALID_PHONE_NUMBER
+                }
+
+            }
+        })
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this@AddActivity, message, Toast.LENGTH_SHORT).show()
     }
 }
