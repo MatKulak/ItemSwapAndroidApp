@@ -16,5 +16,7 @@ data class DetailedAdvertisementResponse(
     val description: String?,
     val localizationResponse: LocalizationResponse,
     val userResponse: UserResponse,
+    val category: String,
+    val phoneNumber: String,
     @SerializedName("isFollowed") val isFollowed: Boolean
 ) : Parcelable

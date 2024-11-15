@@ -1,160 +1,164 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:fillViewport="true">
 
-    <!-- Title header with back button -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/closeImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_back" />
+        android:orientation="vertical"
+        android:padding="25dp">
 
         <TextView
             android:id="@+id/titleTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingBottom="10dp"/>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:layout_margin="8dp">
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewPager"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:padding="0dp" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="350dp"
+            android:layout_margin="8dp">
 
-    <!-- Tiles -->
-    <RelativeLayout
-        android:id="@+id/conditionCategoryContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:padding="0dp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Left Container with TextViews -->
-        <LinearLayout
-            android:id="@+id/leftContainer"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/conditionCategoryContainer"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="start">
+            android:layout_marginTop="8dp">
 
-            <TextView
-                android:id="@+id/conditionTextView"
+            <LinearLayout
+                android:id="@+id/leftContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:gravity="center"
-                android:padding="8dp"
-                android:textSize="14sp" />
+                android:orientation="horizontal"
+                android:gravity="start">
 
-            <TextView
-                android:id="@+id/categoryTextView"
+                <com.google.android.material.chip.Chip
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:id="@+id/conditionChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:textSize="14sp"/>
+
+                <com.google.android.material.chip.Chip
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:id="@+id/categoryChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/followImageButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
                 android:padding="8dp"
-                android:textSize="14sp" />
+                android:background="@null"
+                android:contentDescription="@string/followButton" />
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:id="@+id/userInfoContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/username"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/usernameTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/phoneNumber"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/phoneNumberTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/localization"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/locationTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"/>
         </LinearLayout>
 
-        <!-- Right Container with Follow Button -->
-        <ImageButton
-            android:id="@+id/followImageButton"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:padding="8dp"
-            android:background="@android:color/background_light"
-            android:contentDescription="Follow Button" />
-    </RelativeLayout>
-
-
-    <!-- Description header -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/description"
-        android:textSize="16sp"
-        android:textStyle="bold"/>
-
-    <!-- Description text -->
-    <TextView
-        android:id="@+id/descriptionTextView"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_marginTop="4dp"
-        android:textSize="14sp" />
-
-    <!-- User information -->
-    <LinearLayout
-        android:id="@+id/userInfoContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:orientation="vertical">
+            android:layout_marginTop="16dp"
+            android:text="@string/description"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/usernameTextView"
+            android:id="@+id/descriptionTextView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"/>
+            android:layout_height="125dp"
+            android:layout_marginTop="4dp"
+            android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/phoneNumberTextView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="14sp"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
 
-        <TextView
-            android:id="@+id/locationTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"/>
+            <Button
+                android:id="@+id/sendMessageButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/send_message" />
+
+            <Button
+                android:id="@+id/callButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:text="@string/call" />
+        </LinearLayout>
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="20dp">
-
-        <Button
-            android:id="@+id/sendMessageButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/send_message" />
-
-        <Button
-            android:id="@+id/callButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="10dp"
-            android:text="@string/call" />
-
-    </LinearLayout>
-
-
-</LinearLayout>
+</ScrollView>

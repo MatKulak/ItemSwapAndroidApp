@@ -30,7 +30,7 @@ class AdvertisementAdapter(private val advertisements: MutableList<Advertisement
         val imageView: ImageView = view.findViewById(R.id.itemImage)
         val titleView: TextView = view.findViewById(R.id.itemTitle)
         val conditionView: TextView = view.findViewById(R.id.itemCondition)
-        val cityView: TextView = view.findViewById(R.id.itemCity)
+        val localizationView: TextView = view.findViewById(R.id.itemLocalization)
         val addDateView: TextView = view.findViewById(R.id.itemAddDate)
     }
 
@@ -43,7 +43,10 @@ class AdvertisementAdapter(private val advertisements: MutableList<Advertisement
         val advertisement = advertisements[position]
         holder.titleView.text = advertisement.simpleAdvertisementResponse.title
         holder.conditionView.text = advertisement.simpleAdvertisementResponse.condition
-        holder.cityView.text = advertisement.simpleAdvertisementResponse.city
+        val localizationString = advertisement.simpleAdvertisementResponse.city + ", " +
+                advertisement.simpleAdvertisementResponse.street + ", " +
+                advertisement.simpleAdvertisementResponse.postalCode;
+        holder.localizationView.text = localizationString
         holder.addDateView.text = formatDateString(advertisement.simpleAdvertisementResponse.addDate)
 
         val decodedFile = decodeBase64ToByteArray(advertisement.file)

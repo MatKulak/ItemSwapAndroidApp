@@ -1,18 +1,23 @@
 package com.mateusz.itemswap.activities
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.chip.Chip
 import com.mateusz.itemswap.R
 import com.mateusz.itemswap.adapters.ImagePagerAdapter
 import com.mateusz.itemswap.data.advertisement.DetailedAdvertisementResponse
 import com.mateusz.itemswap.helpers.PreferencesHelper
 import com.mateusz.itemswap.network.APIAdvertisement
+import com.mateusz.itemswap.others.Constants.CONNECTION_ERROR
+import com.mateusz.itemswap.others.Constants.SERVER_ERROR
 import com.mateusz.itemswap.utils.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -23,11 +28,10 @@ class AdvertisementActivity : AppCompatActivity() {
     private lateinit var files: List<String>
     private lateinit var apiAdvertisement: APIAdvertisement
     private lateinit var preferencesHelper: PreferencesHelper
-    private lateinit var closeImageButton: ImageButton
     private lateinit var titleTextView: TextView
     private lateinit var viewPager: ViewPager2
-    private lateinit var conditionTextView: TextView
-    private lateinit var categoryTextView: TextView
+    private lateinit var conditionChip: Chip
+    private lateinit var categoryChip: Chip
     private lateinit var descriptionTextView: TextView
     private lateinit var usernameTextView: TextView
     private lateinit var phoneNumberTextView: TextView
@@ -43,15 +47,14 @@ class AdvertisementActivity : AppCompatActivity() {
         setContentView(R.layout.activity_advertisement)
         preferencesHelper = PreferencesHelper(this)
         apiAdvertisement = RetrofitClient.getService(APIAdvertisement::class.java, preferencesHelper)
-        closeImageButton = findViewById(R.id.closeImageButton)
         titleTextView = findViewById(R.id.titleTextView)
         viewPager = findViewById(R.id.viewPager)
-        conditionTextView = findViewById(R.id.conditionTextView)
-        categoryTextView = findViewById(R.id.categoryTextView)//
+        conditionChip = findViewById(R.id.conditionChip)
+        categoryChip = findViewById(R.id.categoryChip)
         descriptionTextView = findViewById(R.id.descriptionTextView)
         usernameTextView = findViewById(R.id.usernameTextView)
         phoneNumberTextView = findViewById(R.id.phoneNumberTextView)
-        localizationTextView = findViewById(R.id.locationTextView)//
+        localizationTextView = findViewById(R.id.locationTextView)
         sendMessageButton = findViewById(R.id.sendMessageButton)
         followImageButton = findViewById(R.id.followImageButton)
         callButton = findViewById(R.id.callButton)
@@ -64,28 +67,30 @@ class AdvertisementActivity : AppCompatActivity() {
         setDataFromResponse()
         setInitialFollowStatus()
         loadFiles()
+
         followImageButton.setOnClickListener {
             updateFollowStatus()
         }
-        closeImageButton.setOnClickListener {
-            goBackToList()
-        }
+
         sendMessageButton.setOnClickListener {
             sendMessage()
         }
+
+        callButton.setOnClickListener {
+            call()
+        }
+    }
+
+    private fun call() {
+        val intent = Intent(Intent.ACTION_DIAL)
+        intent.data = Uri.parse("tel:${response.phoneNumber}")
+        startActivity(intent)
     }
 
     private fun sendMessage() {
         val intent = Intent(this, MessageActivity::class.java)
         intent.putExtra("advertisementDetails", response)
         startActivity(intent)
-    }
-
-
-    private fun goBackToList() {
-        val intent = Intent(this@AdvertisementActivity, MainActivity::class.java)
-        startActivity(intent)
-        finish()
     }
 
     private fun setInitialFollowStatus() {
@@ -96,15 +101,15 @@ class AdvertisementActivity : AppCompatActivity() {
     }
 
     private fun setDataFromResponse() {
-        val localizationString = response.localizationResponse.city + ", " + response.localizationResponse.street
-        val conditionString = response.condition
-        val categoryString = "ELECTRONICS"
+        val localizationString = response.localizationResponse.city + ", " +
+                response.localizationResponse.street + ", " +
+                response.localizationResponse.postalCode
         titleTextView.text = response.title
-        conditionTextView.text = conditionString
-        categoryTextView.text = categoryString
+        conditionChip.text = response.condition
+        categoryChip.text = response.category
         descriptionTextView.text = response.description
         usernameTextView.text = response.userResponse.username
-        phoneNumberTextView.text = response.userResponse.phoneNumber//
+        phoneNumberTextView.text = response.phoneNumber
         localizationTextView.text = localizationString
     }
 
@@ -114,8 +119,6 @@ class AdvertisementActivity : AppCompatActivity() {
 
         advertisementDetails?.let {
             response = it
-        } ?: run {
-            TODO()
         }
     }
 
@@ -127,16 +130,14 @@ class AdvertisementActivity : AppCompatActivity() {
                     fileList?.let {
                         files = it
                         setupViewPager()
-                    } ?: run {
-                        TODO()
                     }
                 } else {
-                    TODO()
+                    showToast(SERVER_ERROR)
                 }
             }
 
             override fun onFailure(call: Call<List<String>>, t: Throwable) {
-                TODO()
+                showToast(CONNECTION_ERROR)
             }
         })
     }
@@ -153,16 +154,14 @@ class AdvertisementActivity : AppCompatActivity() {
                         } else {
                             followImageButton.setImageResource(R.drawable.ic_heart_gray)
                         }
-                    } ?: run {
-                        TODO()
                     }
                 } else {
-                    TODO()
+                    showToast(SERVER_ERROR)
                 }
             }
 
             override fun onFailure(call: Call<Boolean>, t: Throwable) {
-                TODO()
+                showToast(CONNECTION_ERROR)
             }
         })
 
@@ -171,5 +170,9 @@ class AdvertisementActivity : AppCompatActivity() {
     private fun setupViewPager() {
         val adapter = ImagePagerAdapter(files)
         viewPager.adapter = adapter
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this@AdvertisementActivity, message, Toast.LENGTH_SHORT).show()
     }
 }

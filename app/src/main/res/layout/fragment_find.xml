@@ -18,23 +18,25 @@
         android:padding="8dp"
         android:layout_margin="8dp">
 
-        <EditText
-            android:id="@+id/searchEditText"
-            android:layout_width="0dp"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/searchTextField"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:hint="@string/search_advertisements"
-            android:padding="8dp"
-            android:background="?attr/editTextBackground" />
+            app:endIconMode="custom"
+            app:endIconDrawable="@drawable/ic_find"
+            app:endIconContentDescription="@string/search"
+            app:boxBackgroundMode="filled">
 
-        <ImageButton
-            android:id="@+id/searchButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_find"
-            android:contentDescription="@string/search"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="8dp"/>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/searchEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:inputType="text"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
     </LinearLayout>
 
     <FrameLayout
