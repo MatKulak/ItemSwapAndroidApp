@@ -8,12 +8,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.mateusz.itemswap.R
 import com.mateusz.itemswap.activities.AdvertisementActivity
 import com.mateusz.itemswap.data.advertisement.AdvertisementWithFileResponse
 import com.mateusz.itemswap.data.advertisement.DetailedAdvertisementResponse
 import com.mateusz.itemswap.network.APIAdvertisement
+import com.mateusz.itemswap.others.Constants.CONNECTION_ERROR
+import com.mateusz.itemswap.others.Constants.SERVER_ERROR
 import com.mateusz.itemswap.utils.DateUtils.formatDateString
 import com.mateusz.itemswap.utils.Utils.decodeBase64ToByteArray
 import retrofit2.Call
@@ -21,9 +24,11 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.util.UUID
 
-class AdvertisementAdapter(private val advertisements: MutableList<AdvertisementWithFileResponse>,
-                           private val apiAdvertisement: APIAdvertisement,
-                           private val personalAdvertisement: Boolean = false) :
+class AdvertisementAdapter(
+    private val advertisements: MutableList<AdvertisementWithFileResponse>,
+    private val apiAdvertisement: APIAdvertisement,
+    private val personalAdvertisement: Boolean = false
+) :
     RecyclerView.Adapter<AdvertisementAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -35,7 +40,8 @@ class AdvertisementAdapter(private val advertisements: MutableList<Advertisement
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_advertisement, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_advertisement, parent, false)
         return ViewHolder(view)
     }
 
@@ -45,9 +51,10 @@ class AdvertisementAdapter(private val advertisements: MutableList<Advertisement
         holder.conditionView.text = advertisement.simpleAdvertisementResponse.condition
         val localizationString = advertisement.simpleAdvertisementResponse.city + ", " +
                 advertisement.simpleAdvertisementResponse.street + ", " +
-                advertisement.simpleAdvertisementResponse.postalCode;
+                advertisement.simpleAdvertisementResponse.postalCode
         holder.localizationView.text = localizationString
-        holder.addDateView.text = formatDateString(advertisement.simpleAdvertisementResponse.addDate)
+        holder.addDateView.text =
+            formatDateString(advertisement.simpleAdvertisementResponse.addDate)
 
         val decodedFile = decodeBase64ToByteArray(advertisement.file)
         if (decodedFile != null) {
@@ -56,7 +63,10 @@ class AdvertisementAdapter(private val advertisements: MutableList<Advertisement
         }
 
         holder.itemView.setOnClickListener {
-            getAdvertisementDetails(advertisement.simpleAdvertisementResponse.id, holder.itemView.context)
+            getAdvertisementDetails(
+                advertisement.simpleAdvertisementResponse.id,
+                holder.itemView.context
+            )
         }
     }
 
@@ -76,27 +86,33 @@ class AdvertisementAdapter(private val advertisements: MutableList<Advertisement
     }
 
     private fun getAdvertisementDetails(id: UUID, context: Context) {
-        apiAdvertisement.getAdvertisementById(id).enqueue(object : Callback<DetailedAdvertisementResponse> {
-            override fun onResponse(call: Call<DetailedAdvertisementResponse>, response: Response<DetailedAdvertisementResponse>) {
-                if (response.isSuccessful) {
-                    val detailedAdvertisementResponse = response.body()
-                    detailedAdvertisementResponse?.let {
-                        val intent = Intent(context, AdvertisementActivity::class.java).apply {
-                            putExtra("advertisementDetails", it)
-                            putExtra("personalAdvertisement", personalAdvertisement)
+        apiAdvertisement.getAdvertisementById(id)
+            .enqueue(object : Callback<DetailedAdvertisementResponse> {
+                override fun onResponse(
+                    call: Call<DetailedAdvertisementResponse>,
+                    response: Response<DetailedAdvertisementResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val detailedAdvertisementResponse = response.body()
+                        detailedAdvertisementResponse?.let {
+                            val intent = Intent(context, AdvertisementActivity::class.java).apply {
+                                putExtra("advertisementDetails", it)
+                                putExtra("personalAdvertisement", personalAdvertisement)
+                            }
+                            context.startActivity(intent)
                         }
-                        context.startActivity(intent)
-                    } ?: run {
-                        TODO()
+                    } else {
+                        showToast(SERVER_ERROR, context)
                     }
-                } else {
-                    TODO()
                 }
-            }
 
-            override fun onFailure(call: Call<DetailedAdvertisementResponse>, t: Throwable) {
-                TODO()
-            }
-        })
+                override fun onFailure(call: Call<DetailedAdvertisementResponse>, t: Throwable) {
+                    showToast(CONNECTION_ERROR, context)
+                }
+            })
+    }
+
+    private fun showToast(message: String, context: Context) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 }

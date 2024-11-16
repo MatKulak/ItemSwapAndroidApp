@@ -19,8 +19,8 @@ import com.mateusz.itemswap.network.APIConversation
 import com.mateusz.itemswap.utils.RetrofitClient
 import com.mateusz.itemswap.utils.Utils.jsonToObject
 import com.mateusz.itemswap.utils.Utils.objectToJson
-import com.mateusz.itemswap.zztest.WebSocketListener
-import com.mateusz.itemswap.zztest.WebSocketManager
+import com.mateusz.itemswap.websocket.WebSocketListener
+import com.mateusz.itemswap.websocket.WebSocketManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -151,9 +151,7 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
         }
     }
 
-    override fun onConnectionOpened() {
-    }
+    override fun onConnectionOpened() {}
 
-    override fun onConnectionClosed() {
-    }
+    override fun onConnectionClosed() {}
 }

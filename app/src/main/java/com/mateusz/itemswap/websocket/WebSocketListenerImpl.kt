@@ -1,4 +1,4 @@
-package com.mateusz.itemswap.zztest
+package com.mateusz.itemswap.websocket
 
 import com.mateusz.itemswap.utils.Utils.isValidJson
 import com.mateusz.itemswap.utils.Utils.parseStompMessageBody

@@ -10,7 +10,6 @@ import com.mateusz.itemswap.fragment.FindFragment
 import com.mateusz.itemswap.fragment.FollowedFragment
 import com.mateusz.itemswap.fragment.MessagesFragment
 
-
 class MainActivity : AppCompatActivity() {
     
     private lateinit var bottomNavigation: BottomNavigationView;

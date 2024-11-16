@@ -1,4 +1,4 @@
-package com.mateusz.itemswap.ztest
+package com.mateusz.itemswap.data.others
 
 data class Page<T>(
     val content: List<T>,

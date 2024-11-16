@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.mateusz.itemswap.R
 import com.mateusz.itemswap.activities.MessageActivity
@@ -14,10 +15,11 @@ import com.mateusz.itemswap.data.conversation.ConversationResponse
 import com.mateusz.itemswap.data.conversation.SimpleConversationResponse
 import com.mateusz.itemswap.network.APIAdvertisement
 import com.mateusz.itemswap.network.APIConversation
+import com.mateusz.itemswap.others.Constants.CONNECTION_ERROR
+import com.mateusz.itemswap.others.Constants.SERVER_ERROR
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.UUID
 
 class ConversationAdapter(
     private val conversations: MutableList<SimpleConversationResponse>,
@@ -28,12 +30,14 @@ class ConversationAdapter(
     private lateinit var advertisementDetails: DetailedAdvertisementResponse
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val advertisementTitleTextView: TextView = view.findViewById(R.id.advertisementTitleTextView)
+        val advertisementTitleTextView: TextView =
+            view.findViewById(R.id.advertisementTitleTextView)
         val usernameTextView: TextView = view.findViewById(R.id.usernameTextView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_conversation, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_conversation, parent, false)
         return ViewHolder(view)
     }
 
@@ -57,7 +61,10 @@ class ConversationAdapter(
         notifyItemRangeInserted(startPosition, newConversations.size)
     }
 
-    private fun getAdvertisementDetails(conversation: SimpleConversationResponse, context: Context) {
+    private fun getAdvertisementDetails(
+        conversation: SimpleConversationResponse,
+        context: Context
+    ) {
         apiAdvertisement.getAdvertisementById(conversation.advertisementId)
             .enqueue(object : Callback<DetailedAdvertisementResponse> {
                 override fun onResponse(
@@ -70,18 +77,22 @@ class ConversationAdapter(
                             advertisementDetails = detailedAdvertisementResponse
                             getConversationDetails(conversation, context)
                         }
+                    } else {
+                        showToast(SERVER_ERROR, context)
                     }
                 }
 
                 override fun onFailure(call: Call<DetailedAdvertisementResponse>, t: Throwable) {
-                    // Handle failure as needed
-                    TODO()
+                    showToast(CONNECTION_ERROR, context)
                 }
             })
     }
 
     private fun getConversationDetails(conversation: SimpleConversationResponse, context: Context) {
-        apiConversation.getConversationByAdvertisementId(conversation.advertisementId, conversation.participantId)
+        apiConversation.getConversationByAdvertisementId(
+            conversation.advertisementId,
+            conversation.participantId
+        )
             .enqueue(object : Callback<ConversationResponse> {
                 override fun onResponse(
                     call: Call<ConversationResponse>,
@@ -96,13 +107,18 @@ class ConversationAdapter(
                             }
                             context.startActivity(intent)
                         }
+                    } else {
+                        showToast(SERVER_ERROR, context)
                     }
                 }
 
                 override fun onFailure(call: Call<ConversationResponse>, t: Throwable) {
-                    // Handle failure as needed
-                    TODO()
+                    showToast(CONNECTION_ERROR, context)
                 }
             })
+    }
+
+    private fun showToast(message: String, context: Context) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 }

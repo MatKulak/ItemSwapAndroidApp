@@ -6,6 +6,7 @@ import com.mateusz.itemswap.data.localization.LocalizationResponse
 import com.mateusz.itemswap.data.user.UserResponse
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
+
 @Parcelize
 data class DetailedAdvertisementResponse(
     val id: UUID,

@@ -16,7 +16,7 @@ import com.mateusz.itemswap.network.APIAdvertisement
 import com.mateusz.itemswap.utils.RetrofitClient
 import com.mateusz.itemswap.utils.Utils.createParams
 import com.mateusz.itemswap.utils.Utils.updateParams
-import com.mateusz.itemswap.ztest.Page
+import com.mateusz.itemswap.data.others.Page
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

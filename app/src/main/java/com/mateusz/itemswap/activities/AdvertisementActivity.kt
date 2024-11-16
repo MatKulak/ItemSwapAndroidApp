@@ -24,6 +24,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class AdvertisementActivity : AppCompatActivity() {
+
     private lateinit var response: DetailedAdvertisementResponse
     private lateinit var files: List<String>
     private lateinit var apiAdvertisement: APIAdvertisement

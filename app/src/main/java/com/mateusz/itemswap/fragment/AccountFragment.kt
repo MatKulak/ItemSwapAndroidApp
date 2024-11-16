@@ -18,13 +18,13 @@ import com.google.android.material.textfield.TextInputLayout
 import com.mateusz.itemswap.R
 import com.mateusz.itemswap.activities.LoginActivity
 import com.mateusz.itemswap.data.auth.AuthenticationResponse
-import com.mateusz.itemswap.data.auth.RegisterRequest
 import com.mateusz.itemswap.data.others.SimpleValidationRequest
 import com.mateusz.itemswap.data.user.UpdateUserRequest
 import com.mateusz.itemswap.data.user.UserResponse
 import com.mateusz.itemswap.helpers.PreferencesHelper
 import com.mateusz.itemswap.network.APIAuthenticate
 import com.mateusz.itemswap.network.APIUser
+import com.mateusz.itemswap.others.Constants.ACCOUNT_UPDATE_SUCCESS
 import com.mateusz.itemswap.others.Constants.CONNECTION_ERROR
 import com.mateusz.itemswap.others.Constants.EMAIL_ALREADY_TAKEN
 import com.mateusz.itemswap.others.Constants.EMAIL_FORMAT_VALIDATION_ERROR
@@ -41,7 +41,7 @@ import com.mateusz.itemswap.others.Constants.USERNAME_LENGTH_VALIDATION_ERROR
 import com.mateusz.itemswap.utils.RetrofitClient
 import com.mateusz.itemswap.utils.Utils.getTextFieldStringValue
 import com.mateusz.itemswap.utils.Utils.isTextFieldValid
-import com.mateusz.itemswap.zztest.WebSocketManager
+import com.mateusz.itemswap.websocket.WebSocketManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -61,14 +61,13 @@ class AccountFragment : Fragment() {
     private lateinit var passwordTextField: TextInputLayout
     private lateinit var changePasswordCheckBox: CheckBox
     private lateinit var user: UserResponse
+
     private var validationRunnable: Runnable? = null
     private val debounceHandler = Handler(Looper.getMainLooper())
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_account, container, false)
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -153,6 +152,7 @@ class AccountFragment : Fragment() {
                         preferencesHelper.setJwtToken(token)
                     }
                     updateUserData()
+                    showToast(ACCOUNT_UPDATE_SUCCESS)
                 } else {
                     showToast(SERVER_ERROR)
                 }
@@ -174,7 +174,6 @@ class AccountFragment : Fragment() {
             emailTextField.editText?.setText(it.email)
         }
     }
-
 
     private fun prepareUpdateUserRequest(): UpdateUserRequest {
         return UpdateUserRequest(
@@ -221,6 +220,11 @@ class AccountFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {
                 val username = s?.toString()
 
+                if (username == user.username) {
+                    usernameTextField.error = null
+                    return
+                }
+
                 if (username.isNullOrEmpty() || username.length < 3) {
                     usernameTextField.error = USERNAME_LENGTH_VALIDATION_ERROR
                     return
@@ -247,6 +251,11 @@ class AccountFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {
                 val phoneNumber = s?.toString()
 
+                if (phoneNumber == user.phoneNumber) {
+                    phoneNumberTextField.error = null
+                    return
+                }
+
                 if (phoneNumber.isNullOrEmpty() || phoneNumber.length != 9) {
                     phoneNumberTextField.error = PHONE_NUMBER_LENGTH_VALIDATION_ERROR
                     return
@@ -272,6 +281,11 @@ class AccountFragment : Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 val email = s?.toString()
+
+                if (email == user.email) {
+                    emailTextField.error = null
+                    return
+                }
 
                 if (email.isNullOrEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     emailTextField.error = EMAIL_FORMAT_VALIDATION_ERROR

@@ -9,7 +9,10 @@ import com.mateusz.itemswap.R
 import com.mateusz.itemswap.data.message.MessageResponse
 import com.mateusz.itemswap.data.user.UserResponse
 
-class MessageAdapter(private val messages: List<MessageResponse>, private val userResponse: UserResponse?) :
+class MessageAdapter(
+    private val messages: List<MessageResponse>,
+    private val userResponse: UserResponse?
+) :
     RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     inner class MessageViewHolder(view: View) : RecyclerView.ViewHolder(view) {

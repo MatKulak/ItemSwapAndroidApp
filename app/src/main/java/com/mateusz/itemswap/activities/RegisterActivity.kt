@@ -34,7 +34,7 @@ import com.mateusz.itemswap.others.Constants.USERNAME_LENGTH_VALIDATION_ERROR
 import com.mateusz.itemswap.utils.RetrofitClient
 import com.mateusz.itemswap.utils.Utils.getTextFieldStringValue
 import com.mateusz.itemswap.utils.Utils.isTextFieldValid
-import com.mateusz.itemswap.zztest.WebSocketManager
+import com.mateusz.itemswap.websocket.WebSocketManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

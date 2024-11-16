@@ -78,6 +78,7 @@ class AddActivity : AppCompatActivity() {
     private lateinit var preferencesHelper: PreferencesHelper
     private lateinit var apiAdvertisement: APIAdvertisement
     private lateinit var apiCategory: APICategory
+
     private var selectedImages: MutableList<Uri> = mutableListOf()
     private var edit: Boolean = false
     private var advertisementId: UUID? = null

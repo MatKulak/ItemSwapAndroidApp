@@ -10,7 +10,6 @@ import com.google.android.material.textfield.TextInputLayout
 import com.mateusz.itemswap.R
 import com.mateusz.itemswap.utils.Utils.createParams
 
-
 class FindFragment : Fragment() {
 
     private lateinit var searchEditText: EditText

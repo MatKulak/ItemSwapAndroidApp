@@ -2,7 +2,7 @@ package com.mateusz.itemswap.network
 
 import com.mateusz.itemswap.data.advertisement.AdvertisementWithFileResponse
 import com.mateusz.itemswap.data.advertisement.DetailedAdvertisementResponse
-import com.mateusz.itemswap.ztest.Page
+import com.mateusz.itemswap.data.others.Page
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody

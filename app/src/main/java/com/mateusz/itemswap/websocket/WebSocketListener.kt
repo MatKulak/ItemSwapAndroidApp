@@ -1,4 +1,4 @@
-package com.mateusz.itemswap.zztest
+package com.mateusz.itemswap.websocket
 
 interface WebSocketListener {
     fun onMessageReceived(message: String)

@@ -15,7 +15,7 @@ import com.mateusz.itemswap.network.APIAuthenticate
 import com.mateusz.itemswap.others.Constants.CONNECTION_ERROR
 import com.mateusz.itemswap.others.Constants.INVALID_CREDENTIALS
 import com.mateusz.itemswap.utils.RetrofitClient
-import com.mateusz.itemswap.zztest.WebSocketManager
+import com.mateusz.itemswap.websocket.WebSocketManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

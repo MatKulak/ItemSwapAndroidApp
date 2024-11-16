@@ -2,7 +2,7 @@ package com.mateusz.itemswap.network
 
 import com.mateusz.itemswap.data.conversation.ConversationResponse
 import com.mateusz.itemswap.data.conversation.SimpleConversationResponse
-import com.mateusz.itemswap.ztest.Page
+import com.mateusz.itemswap.data.others.Page
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query

@@ -6,7 +6,8 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.mateusz.itemswap.fragment.MyAdvertisementsFragment
 import com.mateusz.itemswap.fragment.MyFollowedAdvertisementsFragment
 
-class FollowedPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
+class FollowedPagerAdapter(fragmentActivity: FragmentActivity) :
+    FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int {
         return 2
     }
