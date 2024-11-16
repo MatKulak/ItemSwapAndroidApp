@@ -3,10 +3,14 @@ package com.mateusz.itemswap.network
 import com.mateusz.itemswap.data.auth.LoginRequest
 import com.mateusz.itemswap.data.auth.AuthenticationResponse
 import com.mateusz.itemswap.data.auth.RegisterRequest
+import com.mateusz.itemswap.data.user.UpdateUserRequest
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Path
+import java.util.UUID
 
 interface APIAuthenticate {
 
@@ -21,4 +25,7 @@ interface APIAuthenticate {
 
     @GET("/auth/logged-in")
     fun isLoggedIn(): Call<Boolean>
+
+    @PATCH("/auth/{id}/update")
+    fun updateUser(@Path("id") id: UUID, @Body updateUserRequest: UpdateUserRequest): Call<AuthenticationResponse>
 }

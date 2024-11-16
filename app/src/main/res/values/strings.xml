@@ -50,4 +50,8 @@
     <string name="edit">Edit</string>
     <string name="editAdvertisement">Edit advertisement</string>
     <string name="save">Save</string>
+    <string name="noAdvertisements">No advertisements available</string>
+    <string name="noMessages">No messages available</string>
+    <string name="changePassword">Change password</string>
+    <string name="updateAccountTitle">Update account information</string>
 </resources>

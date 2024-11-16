@@ -15,7 +15,7 @@ object Constants {
     const val EMAIL_ALREADY_TAKEN = "Email already taken"
     const val PASSWORD_LENGTH_VALIDATION_ERROR = "Password must be at least 6 characters"
     const val INVALID_FORM = "Invalid form"
-    const val REQUIRED_FIELD = "Field is required form"
+    const val REQUIRED_FIELD = "Field is required"
 
     //    login
     const val INVALID_CREDENTIALS = "Invalid credentials"
