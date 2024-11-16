@@ -12,10 +12,20 @@
         android:spacing="16dp">
 
         <TextView
+            android:id="@+id/addTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="@string/addAdvertisement"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/editTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/editAdvertisement"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -177,11 +187,19 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-            android:id="@+id/addBtn"
+            android:id="@+id/addButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="16dp"
             android:text="@string/add" />
+
+        <Button
+            android:id="@+id/editButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/save" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

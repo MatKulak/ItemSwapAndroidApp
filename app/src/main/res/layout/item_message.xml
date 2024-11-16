@@ -1,20 +1,43 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-    android:padding="8dp">
+    android:padding="1dp">
 
-    <TextView
-        android:id="@+id/senderTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/contentTextView"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textColor="@android:color/black" />
+        android:orientation="horizontal"
+        android:gravity="start">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/messageChipLeft"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:textSize="14sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/messageChipRight"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            app:chipBackgroundColor="?attr/colorPrimary"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:textSize="14sp"
+            android:visibility="gone" />
+    </LinearLayout>
 </LinearLayout>

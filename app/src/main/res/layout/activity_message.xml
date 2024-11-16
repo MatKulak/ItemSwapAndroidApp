@@ -5,23 +5,35 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Advertisement title -->
+    <TextView
+        android:id="@+id/advertisementTitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingBottom="10dp"/>
+
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_user" />
+
         <TextView
-            android:id="@+id/advertisementTitleTextView"
+            android:id="@+id/advertisementUsernameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:textSize="18sp"
+            android:paddingBottom="10dp"
+            android:textSize="20sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Messages List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messagesRecyclerView"
         android:layout_width="match_parent"
@@ -29,25 +41,29 @@
         android:layout_weight="1"
         android:scrollbars="vertical" />
 
-    <!-- Message Input and Send Button -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingTop="8dp">
+        android:padding="8dp"
+        android:layout_margin="8dp">
 
-        <EditText
-            android:id="@+id/messageEditText"
-            android:layout_width="0dp"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/sendMessageField"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Type a message" />
+            android:hint="@string/typeMessage"
+            app:endIconMode="custom"
+            app:endIconDrawable="@drawable/ic_send"
+            app:endIconContentDescription="@string/send"
+            app:boxBackgroundMode="filled">
 
-        <Button
-            android:id="@+id/sendMessageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Send" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/sendMessageEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 </LinearLayout>
-

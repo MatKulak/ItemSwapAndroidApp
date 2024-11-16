@@ -39,6 +39,7 @@ class AdvertisementActivity : AppCompatActivity() {
     private lateinit var sendMessageButton: Button
     private lateinit var followImageButton: ImageButton
     private lateinit var callButton: Button
+    private lateinit var editButton: Button
 
     private var personalAdvertisement = false
 
@@ -58,10 +59,13 @@ class AdvertisementActivity : AppCompatActivity() {
         sendMessageButton = findViewById(R.id.sendMessageButton)
         followImageButton = findViewById(R.id.followImageButton)
         callButton = findViewById(R.id.callButton)
+        editButton = findViewById(R.id.editButton)
 
         personalAdvertisement = intent.getBooleanExtra("personalAdvertisement", false)
         sendMessageButton.visibility = if (!personalAdvertisement) View.VISIBLE else View.GONE
         followImageButton.visibility = if (!personalAdvertisement) View.VISIBLE else View.GONE
+        callButton.visibility = if (!personalAdvertisement) View.VISIBLE else View.GONE
+        editButton.visibility = if (!personalAdvertisement) View.GONE else View.VISIBLE
 
         setDetailedAdvertisementResponse()
         setDataFromResponse()
@@ -79,6 +83,16 @@ class AdvertisementActivity : AppCompatActivity() {
         callButton.setOnClickListener {
             call()
         }
+
+        editButton.setOnClickListener {
+            edit()
+        }
+    }
+
+    private fun edit() {
+        val intent = Intent(this, AddActivity::class.java)
+        intent.putExtra("advertisementId", response.id.toString())
+        startActivity(intent)
     }
 
     private fun call() {

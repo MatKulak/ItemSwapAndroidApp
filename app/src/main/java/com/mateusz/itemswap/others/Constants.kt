@@ -22,6 +22,7 @@ object Constants {
 
     //    advertisement
     const val ADVERTISEMENT_ADD_SUCCESS = "Advertisement added successfully"
+    const val ADVERTISEMENT_UPDATE_SUCCESS = "Advertisement updated successfully"
     const val TITLE_VALIDATION_ERROR = "Title must be at least 3 characters"
     const val DESCRIPTION_VALIDATION_ERROR = "Description must be at least 3 characters"
     const val CITY_VALIDATION_ERROR = "City must be at least 3 characters"

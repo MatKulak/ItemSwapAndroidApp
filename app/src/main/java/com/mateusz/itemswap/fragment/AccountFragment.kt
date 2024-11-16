@@ -12,6 +12,8 @@ import com.mateusz.itemswap.R
 import com.mateusz.itemswap.activities.LoginActivity
 import com.mateusz.itemswap.helpers.PreferencesHelper
 import com.mateusz.itemswap.network.APIAuthenticate
+import com.mateusz.itemswap.others.Constants.CONNECTION_ERROR
+import com.mateusz.itemswap.others.Constants.SERVER_ERROR
 import com.mateusz.itemswap.utils.RetrofitClient
 import com.mateusz.itemswap.zztest.WebSocketManager
 import retrofit2.Call
@@ -54,13 +56,17 @@ class AccountFragment : Fragment() {
                     requireActivity().finish()
                     WebSocketManager.disconnect()
                 } else {
-                    Toast.makeText(requireContext(), "Failed to logout, please try again.", Toast.LENGTH_SHORT).show()
+                    showToast(SERVER_ERROR)
                 }
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                    Toast.makeText(requireContext(), "Internal server error", Toast.LENGTH_SHORT).show()
+                    showToast(CONNECTION_ERROR)
             }
         })
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 }

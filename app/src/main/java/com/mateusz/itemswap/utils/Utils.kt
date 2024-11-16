@@ -1,10 +1,15 @@
 package com.mateusz.itemswap.utils
 
+import android.content.Context
+import android.net.Uri
 import android.util.Base64
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 object Utils {
 
@@ -15,6 +20,20 @@ object Utils {
             } catch (e: IllegalArgumentException) {
                 null
             }
+        }
+    }
+
+    fun base64ToUri(context: Context, base64String: String): Uri? {
+        return try {
+            val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
+            val tempFile = File(context.cacheDir, "image_${System.currentTimeMillis()}.jpg")
+            val fos = FileOutputStream(tempFile)
+            fos.write(decodedBytes)
+            fos.close()
+            Uri.fromFile(tempFile)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
         }
     }
 

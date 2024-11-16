@@ -10,11 +10,13 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -23,11 +25,13 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
 import com.mateusz.itemswap.R
 import com.mateusz.itemswap.data.advertisement.AddAdvertisementRequest
+import com.mateusz.itemswap.data.advertisement.DetailedAdvertisementResponse
 import com.mateusz.itemswap.enums.Condition
 import com.mateusz.itemswap.helpers.PreferencesHelper
 import com.mateusz.itemswap.network.APIAdvertisement
 import com.mateusz.itemswap.network.APICategory
 import com.mateusz.itemswap.others.Constants.ADVERTISEMENT_ADD_SUCCESS
+import com.mateusz.itemswap.others.Constants.ADVERTISEMENT_UPDATE_SUCCESS
 import com.mateusz.itemswap.others.Constants.CITY_VALIDATION_ERROR
 import com.mateusz.itemswap.others.Constants.CONNECTION_ERROR
 import com.mateusz.itemswap.others.Constants.DESCRIPTION_VALIDATION_ERROR
@@ -40,6 +44,7 @@ import com.mateusz.itemswap.others.Constants.SERVER_ERROR
 import com.mateusz.itemswap.others.Constants.STREET_VALIDATION_ERROR
 import com.mateusz.itemswap.others.Constants.TITLE_VALIDATION_ERROR
 import com.mateusz.itemswap.utils.RetrofitClient
+import com.mateusz.itemswap.utils.Utils.base64ToUri
 import com.mateusz.itemswap.utils.Utils.getTextFieldStringValue
 import com.mateusz.itemswap.utils.Utils.isTextFieldValid
 import okhttp3.MediaType
@@ -52,6 +57,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.InputStream
+import java.util.UUID
 
 class AddActivity : AppCompatActivity() {
 
@@ -65,12 +71,17 @@ class AddActivity : AppCompatActivity() {
     private lateinit var streetTextField: TextInputLayout
     private lateinit var postalCodeTextField: TextInputLayout
     private lateinit var phoneNumberTextField: TextInputLayout
-
+    private lateinit var editTextView: TextView
+    private lateinit var addTextView: TextView
     private lateinit var addButton: Button
+    private lateinit var editButton: Button
     private lateinit var preferencesHelper: PreferencesHelper
     private lateinit var apiAdvertisement: APIAdvertisement
     private lateinit var apiCategory: APICategory
     private var selectedImages: MutableList<Uri> = mutableListOf()
+    private var edit: Boolean = false
+    private var advertisementId: UUID? = null
+    private var advertisementDetails: DetailedAdvertisementResponse? = null
 
     companion object {
         private const val REQUEST_CODE_SELECT_IMAGES = 1
@@ -94,10 +105,15 @@ class AddActivity : AppCompatActivity() {
         streetTextField = findViewById(R.id.streetTextField)
         postalCodeTextField = findViewById(R.id.postalCodeTextField)
         phoneNumberTextField = findViewById(R.id.phoneNumberTextField)
-        addButton = findViewById(R.id.addBtn)
-
-        populateSpinnerCategories()
-        populateSpinnerConditions()
+        addButton = findViewById(R.id.addButton)
+        editButton = findViewById(R.id.editButton)
+        editTextView = findViewById(R.id.editTextView)
+        addTextView = findViewById(R.id.addTextView)
+        updateEditMode()
+        determineActivityTitleAndButton()
+        if (!edit) populateSpinnerCategories()
+        if (!edit) populateSpinnerConditions()
+        patchForm()
 
         imageSelectionBox.setOnClickListener {
             if (selectedImages.isNotEmpty()) {
@@ -111,6 +127,10 @@ class AddActivity : AppCompatActivity() {
             addAdvertisement()
         }
 
+        editButton.setOnClickListener {
+            addAdvertisement()
+        }
+
         watchSimpleTextFieldChange(titleTextField, TITLE_VALIDATION_ERROR)
         watchSimpleTextFieldChange(descriptionTextField, DESCRIPTION_VALIDATION_ERROR)
         watchSimpleTextFieldChange(cityTextField, CITY_VALIDATION_ERROR)
@@ -120,24 +140,107 @@ class AddActivity : AppCompatActivity() {
         watchPostalCodeChange()
     }
 
+    private fun determineActivityTitleAndButton() {
+        if (edit) {
+            addTextView.visibility = View.GONE
+            editTextView.visibility = View.VISIBLE
+            addButton.visibility = View.GONE
+            editButton.visibility = View.VISIBLE
+        } else {
+            addTextView.visibility = View.VISIBLE
+            editTextView.visibility = View.GONE
+            addButton.visibility = View.VISIBLE
+            editButton.visibility = View.GONE
+        }
+    }
+
+    private fun updateEditMode() {
+        val id = intent.getStringExtra("advertisementId")
+        if (id != null) {
+            edit = true
+            advertisementId = UUID.fromString(id)
+        }
+    }
+
+    private fun patchForm() {
+        if (edit) {
+            getAdvertisementDetails(advertisementId!!)
+        }
+    }
+
+    private fun getAdvertisementDetails(advertisementId: UUID) {
+        apiAdvertisement.getAdvertisementById(advertisementId)
+            .enqueue(object : Callback<DetailedAdvertisementResponse> {
+                override fun onResponse(
+                    call: Call<DetailedAdvertisementResponse>,
+                    response: Response<DetailedAdvertisementResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val detailedAdvertisementResponse = response.body()
+                        if (detailedAdvertisementResponse != null) {
+                            advertisementDetails = detailedAdvertisementResponse
+                            patchTextFields()
+                            loadFiles()
+                        }
+                        populateSpinnerConditions()
+                        populateSpinnerCategories()
+                    } else {
+                        showToast(SERVER_ERROR)
+                    }
+                }
+
+                override fun onFailure(call: Call<DetailedAdvertisementResponse>, t: Throwable) {
+                    showToast(CONNECTION_ERROR)
+                }
+            })
+    }
+
+    private fun patchTextFields() {
+        titleTextField.editText?.setText(advertisementDetails?.title)
+        descriptionTextField.editText?.setText(advertisementDetails?.description)
+        cityTextField.editText?.setText(advertisementDetails?.localizationResponse?.city)
+        streetTextField.editText?.setText(advertisementDetails?.localizationResponse?.street)
+        postalCodeTextField.editText?.setText(advertisementDetails?.localizationResponse?.postalCode)
+        phoneNumberTextField.editText?.setText(advertisementDetails?.phoneNumber)
+    }
+
+    private fun loadFiles() {
+        apiAdvertisement.getAdvertisementFiles(advertisementDetails?.id!!).enqueue(object : Callback<List<String>> {
+            override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
+                if (response.isSuccessful) {
+                    val fileList = response.body()
+                    fileList?.let {
+                        displayLoadedImages(it)
+                    }
+                } else {
+                    showToast(SERVER_ERROR)
+                }
+            }
+
+            override fun onFailure(call: Call<List<String>>, t: Throwable) {
+                showToast(CONNECTION_ERROR)
+            }
+        })
+    }
+
+    private fun displayLoadedImages(fileList: List<String>) {
+        val uriList = fileList.mapNotNull { base64ToUri(this@AddActivity, it) }
+        selectedImages.clear()
+        selectedImages.addAll(uriList)
+        displaySelectedImages()
+    }
+
     private fun checkPermissionsAndOpenGallery() {
         if (ContextCompat.checkSelfPermission(
                 this,
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                    Manifest.permission.READ_MEDIA_IMAGES
-                } else {
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                }
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_IMAGES
+                else Manifest.permission.READ_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                        Manifest.permission.READ_MEDIA_IMAGES
-                    } else {
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                    }
+                this, arrayOf(
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_IMAGES
+                    else Manifest.permission.READ_EXTERNAL_STORAGE
                 ),
                 REQUEST_CODE_READ_MEDIA_IMAGES
             )
@@ -145,7 +248,6 @@ class AddActivity : AppCompatActivity() {
             openGalleryForImages()
         }
     }
-
 
     private fun openGalleryForImages() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
@@ -256,7 +358,7 @@ class AddActivity : AppCompatActivity() {
         val fileParts = uris.map { uri -> prepareFilePart(context, uri) }
         val jsonRequestBody = createJsonRequestBody(addAdvertisementRequest)
 
-        apiAdvertisement.uploadFiles(fileParts, jsonRequestBody)
+        if(!edit) apiAdvertisement.addAdvertisement(fileParts, jsonRequestBody)
             .enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(
                     call: Call<ResponseBody>,
@@ -268,6 +370,27 @@ class AddActivity : AppCompatActivity() {
                         finish()
 
                         showToast(ADVERTISEMENT_ADD_SUCCESS)
+                    } else {
+                        showToast(SERVER_ERROR)
+                    }
+                }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    showToast(CONNECTION_ERROR)
+                }
+            })
+        else apiAdvertisement.updateAdvertisement(advertisementDetails?.id!!, fileParts, jsonRequestBody)
+            .enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>
+                ) {
+                    if (response.isSuccessful) {
+                        val intent = Intent(this@AddActivity, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+
+                        showToast(ADVERTISEMENT_UPDATE_SUCCESS)
                     } else {
                         showToast(SERVER_ERROR)
                     }
@@ -335,6 +458,11 @@ class AddActivity : AppCompatActivity() {
                         )
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                         categorySpinner.adapter = adapter
+
+                        if (edit) {
+                            val position = categories.indexOf(advertisementDetails?.category)
+                            if (position >= 0) categorySpinner.setSelection(position)
+                        }
                     }
                 } else {
                     showToast(SERVER_ERROR)
@@ -352,6 +480,11 @@ class AddActivity : AppCompatActivity() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, conditions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         conditionSpinner.adapter = adapter
+
+        if (edit) {
+            val position = conditions.indexOf(advertisementDetails?.condition)
+            if (position >= 0) conditionSpinner.setSelection(position)
+        }
     }
 
     private fun watchSimpleTextFieldChange(

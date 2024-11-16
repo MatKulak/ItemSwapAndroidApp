@@ -44,4 +44,10 @@
     <string name="street">Street</string>
     <string name="postalCode">Postal code</string>
     <string name="followButton">Follow Button</string>
+    <string name="typeMessage">Type a message</string>
+    <string name="send">Send</string>
+    <string name="sendMessage">Send message</string>
+    <string name="edit">Edit</string>
+    <string name="editAdvertisement">Edit advertisement</string>
+    <string name="save">Save</string>
 </resources>

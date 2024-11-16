@@ -1,7 +1,6 @@
 package com.mateusz.itemswap.activities
 
 import android.os.Bundle
-import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.mateusz.itemswap.R
@@ -9,6 +8,7 @@ import com.mateusz.itemswap.data.advertisement.DetailedAdvertisementResponse
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.TextInputLayout
 import com.mateusz.itemswap.adapters.MessageAdapter
 import com.mateusz.itemswap.data.conversation.ConversationResponse
 import com.mateusz.itemswap.data.message.MessageRequest
@@ -29,10 +29,11 @@ import java.util.UUID
 class MessageActivity : AppCompatActivity(), WebSocketListener {
 
     private lateinit var advertisementTitleTextView: TextView
-    private lateinit var messageEditText: EditText
+    private lateinit var advertisementUsernameTitleTextView: TextView
     private lateinit var messagesRecyclerView: RecyclerView
-    private lateinit var sendMessageButton: Button
     private lateinit var messageAdapter: MessageAdapter
+    private lateinit var sendMessageEditText: EditText
+    private lateinit var sendMessageTextField: TextInputLayout
 
     private lateinit var apiConversation: APIConversation
     private lateinit var preferencesHelper: PreferencesHelper
@@ -46,27 +47,25 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
         advertisementTitleTextView = findViewById(R.id.advertisementTitleTextView)
-        sendMessageButton = findViewById(R.id.sendMessageButton)
-        messageEditText = findViewById(R.id.messageEditText)
+        advertisementUsernameTitleTextView = findViewById(R.id.advertisementUsernameTextView)
+        sendMessageTextField = findViewById(R.id.sendMessageField)
+        sendMessageEditText = findViewById(R.id.sendMessageEditText)
         messagesRecyclerView = findViewById(R.id.messagesRecyclerView)
         preferencesHelper = PreferencesHelper(this)
         apiConversation = RetrofitClient.getService(APIConversation::class.java, preferencesHelper)
         userId = preferencesHelper.getUserContext()?.id!!
         setConversationResponse()
         setDetailedAdvertisementResponse()
-//        getConversationResponse()
-        messageAdapter = MessageAdapter(messages)
+        messageAdapter = MessageAdapter(messages, preferencesHelper.getUserContext())
         messagesRecyclerView.layoutManager = LinearLayoutManager(this)
         messagesRecyclerView.adapter = messageAdapter
         updateConversation()
-        setChatTitle()
-//        WebSocketManager.setListener(this)
-//        WebSocketManager.connect()
+        setChatTitleAndUsername()
+
         WebSocketManager.addListener(this)
-        sendMessageButton.setOnClickListener {
+        sendMessageTextField.setEndIconOnClickListener {
             sendMessage()
         }
-
     }
 
     private fun setConversationResponse() {
@@ -84,7 +83,7 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
 
     private fun sendMessage() {
         preferencesHelper.getUserContext()
-        val content = messageEditText.text.toString()
+        val content = sendMessageEditText.text.toString()
         if (content == "") return
 
         val messageRequest = MessageRequest(
@@ -94,11 +93,12 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
             content
         )
         WebSocketManager.sendMessage(objectToJson(messageRequest))
-        messageEditText.setText("")
+        sendMessageEditText.setText("")
     }
 
-    private fun setChatTitle() {
+    private fun setChatTitleAndUsername() {
         advertisementTitleTextView.text = advertisementDetails.title
+        advertisementUsernameTitleTextView.text = advertisementDetails.userResponse.username
     }
 
     private fun updateConversation() {
