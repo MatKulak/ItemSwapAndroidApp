@@ -114,7 +114,7 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
     }
 
     private fun getConversationResponse() {
-        apiConversation.getConversationByAdvertisementId(advertisementDetails.id, null).enqueue(object : Callback<ConversationResponse> {
+        apiConversation.getConversationByAdvertisementIdAndUserId(advertisementDetails.id, null).enqueue(object : Callback<ConversationResponse> {
             override fun onResponse(call: Call<ConversationResponse>, response: Response<ConversationResponse>) {
                 if (response.isSuccessful) {
                     val conversationResponse = response.body()

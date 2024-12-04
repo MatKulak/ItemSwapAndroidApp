@@ -54,4 +54,7 @@
     <string name="noMessages">No messages available</string>
     <string name="changePassword">Change password</string>
     <string name="updateAccountTitle">Update account information</string>
+    <string name="trade">What do u want to trade for?</string>
+    <string name="wantToTradeFor">Want to trade for:</string>
+    <string name="showAll">show all</string>
 </resources>

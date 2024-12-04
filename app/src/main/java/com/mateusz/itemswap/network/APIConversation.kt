@@ -12,9 +12,9 @@ import java.util.UUID
 interface APIConversation {
 
     @GET("/api/conversation")
-    fun getConversationByAdvertisementId(
+    fun getConversationByAdvertisementIdAndUserId(
         @Query("advertisementId") advertisementId: UUID,
-        @Query("participantId") participantId: UUID?
+        @Query("participantId") userId: UUID?
     ): Call<ConversationResponse>
 
     @GET("/api/conversations/page")

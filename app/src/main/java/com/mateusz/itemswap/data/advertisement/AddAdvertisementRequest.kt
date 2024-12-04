@@ -8,5 +8,6 @@ data class AddAdvertisementRequest(
     val city: String,
     val street: String,
     val postalCode: String,
-    val phoneNumber: String
+    val phoneNumber: String,
+    val trade: String
 )

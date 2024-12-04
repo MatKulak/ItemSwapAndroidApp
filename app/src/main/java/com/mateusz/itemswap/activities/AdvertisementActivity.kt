@@ -37,6 +37,7 @@ class AdvertisementActivity : AppCompatActivity() {
     private lateinit var usernameTextView: TextView
     private lateinit var phoneNumberTextView: TextView
     private lateinit var localizationTextView: TextView
+    private lateinit var tradeTextView: TextView
     private lateinit var sendMessageButton: Button
     private lateinit var followImageButton: ImageButton
     private lateinit var callButton: Button
@@ -61,6 +62,7 @@ class AdvertisementActivity : AppCompatActivity() {
         followImageButton = findViewById(R.id.followImageButton)
         callButton = findViewById(R.id.callButton)
         editButton = findViewById(R.id.editButton)
+        tradeTextView = findViewById(R.id.tradeTextView)
 
         personalAdvertisement = intent.getBooleanExtra("personalAdvertisement", false)
         sendMessageButton.visibility = if (!personalAdvertisement) View.VISIBLE else View.GONE
@@ -126,6 +128,7 @@ class AdvertisementActivity : AppCompatActivity() {
         usernameTextView.text = response.userResponse.username
         phoneNumberTextView.text = response.phoneNumber
         localizationTextView.text = localizationString
+        tradeTextView.text = response.trade
     }
 
     private fun setDetailedAdvertisementResponse() {

@@ -71,6 +71,7 @@ class AddActivity : AppCompatActivity() {
     private lateinit var streetTextField: TextInputLayout
     private lateinit var postalCodeTextField: TextInputLayout
     private lateinit var phoneNumberTextField: TextInputLayout
+    private lateinit var tradeTextField: TextInputLayout
     private lateinit var editTextView: TextView
     private lateinit var addTextView: TextView
     private lateinit var addButton: Button
@@ -106,6 +107,7 @@ class AddActivity : AppCompatActivity() {
         streetTextField = findViewById(R.id.streetTextField)
         postalCodeTextField = findViewById(R.id.postalCodeTextField)
         phoneNumberTextField = findViewById(R.id.phoneNumberTextField)
+        tradeTextField = findViewById(R.id.tradeTextField)
         addButton = findViewById(R.id.addButton)
         editButton = findViewById(R.id.editButton)
         editTextView = findViewById(R.id.editTextView)
@@ -318,7 +320,7 @@ class AddActivity : AppCompatActivity() {
     }
 
     private fun addAdvertisement() {
-        listOf(titleTextField, descriptionTextField, cityTextField, streetTextField, postalCodeTextField).forEach { field ->
+        listOf(titleTextField, descriptionTextField, cityTextField, streetTextField, postalCodeTextField, tradeTextField).forEach { field ->
             if (getTextFieldStringValue(field).isEmpty()) field.error = REQUIRED_FIELD
         }
 
@@ -327,7 +329,8 @@ class AddActivity : AppCompatActivity() {
                     isTextFieldValid(cityTextField) &&
                     isTextFieldValid(streetTextField) &&
                     isTextFieldValid(postalCodeTextField) &&
-                    isTextFieldValid(phoneNumberTextField))) {
+                    isTextFieldValid(phoneNumberTextField) &&
+                    isTextFieldValid(tradeTextField))) {
             showToast(INVALID_FORM)
             return
         }
@@ -345,7 +348,8 @@ class AddActivity : AppCompatActivity() {
             getTextFieldStringValue(cityTextField),
             getTextFieldStringValue(streetTextField),
             getTextFieldStringValue(postalCodeTextField),
-            getTextFieldStringValue(phoneNumberTextField)
+            getTextFieldStringValue(phoneNumberTextField),
+            getTextFieldStringValue(tradeTextField)
         )
 
         uploadAdvertisementWithImages(this@AddActivity, selectedImages, addAdvertisementRequest)

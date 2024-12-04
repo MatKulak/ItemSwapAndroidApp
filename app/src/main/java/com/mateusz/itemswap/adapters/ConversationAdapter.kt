@@ -89,7 +89,7 @@ class ConversationAdapter(
     }
 
     private fun getConversationDetails(conversation: SimpleConversationResponse, context: Context) {
-        apiConversation.getConversationByAdvertisementId(
+        apiConversation.getConversationByAdvertisementIdAndUserId(
             conversation.advertisementId,
             conversation.participantId
         )

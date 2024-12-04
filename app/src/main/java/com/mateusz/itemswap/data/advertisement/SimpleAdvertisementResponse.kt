@@ -10,4 +10,5 @@ data class SimpleAdvertisementResponse(
     val street: String,
     val postalCode: String,
     val addDate: String,
+    val trade: String
 )
