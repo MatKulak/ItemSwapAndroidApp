@@ -42,6 +42,7 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
     private lateinit var userId: UUID
     private var conversation: ConversationResponse? = null
     private var messages: MutableList<MessageResponse> = mutableListOf()
+    private var canSend = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +65,7 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
 
         WebSocketManager.addListener(this)
         sendMessageTextField.setEndIconOnClickListener {
-            sendMessage()
+            if (canSend) sendMessage()
         }
     }
 
@@ -82,6 +83,9 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
     }
 
     private fun sendMessage() {
+        if (conversation == null) {
+            canSend = false
+        }
         preferencesHelper.getUserContext()
         val content = sendMessageEditText.text.toString()
         if (content == "") return
@@ -114,7 +118,7 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
     }
 
     private fun getConversationResponse() {
-        apiConversation.getConversationByAdvertisementIdAndUserId(advertisementDetails.id, null).enqueue(object : Callback<ConversationResponse> {
+        apiConversation.getConversationByAdvertisementId(advertisementDetails.id).enqueue(object : Callback<ConversationResponse> {
             override fun onResponse(call: Call<ConversationResponse>, response: Response<ConversationResponse>) {
                 if (response.isSuccessful) {
                     val conversationResponse = response.body()
@@ -126,6 +130,7 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
             }
 
             override fun onFailure(call: Call<ConversationResponse>, t: Throwable) {
+                val x = 10
             }
         })
     }
@@ -134,7 +139,7 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
         conversation?.let {
             runOnUiThread {
                 messages.clear()
-                messages.addAll(it.messages)
+                messages.addAll(it.messages!!)
                 messageAdapter.notifyDataSetChanged()
             }
         }
@@ -144,6 +149,12 @@ class MessageActivity : AppCompatActivity(), WebSocketListener {
         val responseWithReceivers = jsonToObject(message, MessageResponseWithReceivers::class.java)
 
         if (responseWithReceivers.receiverIds.contains(userId)) {
+            if (conversation == null) {
+                conversation = ConversationResponse(responseWithReceivers.conversationId, null,
+                    null, null)
+                canSend = true
+            }
+
             runOnUiThread {
                 messages.add(responseWithReceivers.messageResponse)
                 messageAdapter.notifyItemInserted(messages.size - 1)

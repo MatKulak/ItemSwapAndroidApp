@@ -8,8 +8,8 @@ import java.util.UUID
 
 @Parcelize
 data class ConversationResponse(
-    val id: UUID,
-    val seller: UserResponse,
-    val buyer: UserResponse,
-    val messages: List<MessageResponse>
+    var id: UUID?,
+    val seller: UserResponse?,
+    val buyer: UserResponse?,
+    val messages: List<MessageResponse>?
 ): Parcelable

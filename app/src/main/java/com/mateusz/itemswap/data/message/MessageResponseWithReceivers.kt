@@ -4,5 +4,6 @@ import java.util.UUID
 
 data class MessageResponseWithReceivers(
     val messageResponse: MessageResponse,
-    val receiverIds: Set<UUID>
+    val receiverIds: Set<UUID>,
+    val conversationId: UUID
 )

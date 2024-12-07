@@ -89,9 +89,8 @@ class ConversationAdapter(
     }
 
     private fun getConversationDetails(conversation: SimpleConversationResponse, context: Context) {
-        apiConversation.getConversationByAdvertisementIdAndUserId(
-            conversation.advertisementId,
-            conversation.participantId
+        apiConversation.getConversationByConversationId(
+            conversation.conversationId,
         )
             .enqueue(object : Callback<ConversationResponse> {
                 override fun onResponse(

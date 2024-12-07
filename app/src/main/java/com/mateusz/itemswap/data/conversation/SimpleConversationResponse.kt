@@ -6,5 +6,6 @@ data class SimpleConversationResponse(
     val advertisementTitle: String,
     val username: String,
     val advertisementId: UUID,
-    val participantId: UUID
+    val participantId: UUID,
+    val conversationId: UUID
 )
